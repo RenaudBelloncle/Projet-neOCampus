@@ -1,3 +1,5 @@
+package SimulationInterface;
+
 import Sensor.*;
 
 import javax.swing.*;
@@ -160,7 +162,7 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
                     Sensor sensor = new InSensor(id_area.getText(), in_building.getText(),
                             in_floor.getText(), in_room.getText(), in_description.getText(),
                             InType.values()[type_box.getSelectedIndex()]);
-                    //SensorFrame sensor_frame = new SensorFrame(sensor);
+                    new SimulationSensorFrame(sensor);
                 }
             } else {
                 if (id_area.getText().isEmpty() || out_longitude_area.getText().isEmpty()
@@ -169,7 +171,7 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
                     error.setVisible(false);
                     Sensor sensor = new OutSensor(id_area.getText(), out_latitude_area.getText(),
                             out_longitude_area.getText(), OutType.values()[type_box.getSelectedIndex()]);
-                    //SensorFrame sensor_frame = new SensorFrame(sensor);
+                    new SimulationSensorFrame(sensor);
                 }
             }
         }
