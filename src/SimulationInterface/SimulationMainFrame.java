@@ -23,6 +23,7 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
     private JRadioButton out;
 
     private JPanel location_area_panel;
+    private JPanel location_description_panel;
     private JTextArea out_latitude_area;
     private JTextArea out_longitude_area;
     private JTextArea in_building;
@@ -42,12 +43,11 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
 
     private JPanel button_panel;
     private JButton button;
-    private JLabel error;
 
 
     public SimulationMainFrame() {
         super("Création de capteur");
-        setSize(500, 250);
+        setSize(400, 250);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         initialiser();
         placer();
@@ -65,6 +65,7 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
         location_panel = new JPanel();
         location_bpanel = new JPanel();
         location_area_panel = new JPanel();
+        location_description_panel = new JPanel();
         location = new JLabel("Localisation : ");
 
         location_rbutton = new ButtonGroup();
@@ -75,29 +76,26 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
         floor = new JLabel("Étage : ");
         room = new JLabel("Salle : ");
         description = new JLabel("Complément : ");
-        latitude = new JLabel("lat : ");
-        longitude = new JLabel("long : ");
+        latitude = new JLabel("Latitude : ");
+        longitude = new JLabel("Longitude : ");
         out_longitude_area = new JTextArea(1,15);
         out_latitude_area = new JTextArea(1,15);
         in_building = new JTextArea(1,3);
         in_floor = new JTextArea(1,3);
         in_room = new JTextArea(1,3);
-        in_description = new JTextArea(1,10);
+        in_description = new JTextArea(1,20);
 
         type_panel = new JPanel();
         type = new JLabel(" Type : ");
         type_box = new JComboBox<>();
 
         button_panel = new JPanel();
-        button = new JButton("Créer capteur ");
-        error = new JLabel("Certains champs sont incomplets !");
+        button = new JButton("Créer et Connecter");
     }
 
     public void placer() {
         Container content = getContentPane();
         button_panel.add(button);
-        button_panel.add(error);
-        error.setVisible(false);
 
         type_panel.add(type);
         type_panel.add(type_box);
@@ -108,22 +106,24 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
         location_bpanel.add(in);
         location_bpanel.add(out);
 
-        location_panel.setLayout(new GridLayout(2,1));
+        location_panel.setLayout(new GridLayout(3,1));
         location_panel.add(location_bpanel);
         location_panel.add(location_area_panel);
+        location_panel.add(location_description_panel);
 
         location_area_panel.add(latitude);
         location_area_panel.add(out_latitude_area);
-        location_area_panel.add(longitude);
-        location_area_panel.add(out_longitude_area);
+        location_description_panel.add(longitude);
+        location_description_panel.add(out_longitude_area);
+
         location_area_panel.add(building);
         location_area_panel.add(in_building);
         location_area_panel.add(floor);
         location_area_panel.add(in_floor);
         location_area_panel.add(room);
         location_area_panel.add(in_room);
-        location_area_panel.add(description);
-        location_area_panel.add(in_description);
+        location_description_panel.add(description);
+        location_description_panel.add(in_description);
 
         setVisibleElement(false, false);
 
@@ -152,13 +152,13 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
         } else if (e.getSource() == out) {
             setVisibleElement(false, true);
 
-        } else if (e.getSource() == button){
+        } else if (e.getSource() == button) {
             if(in.isSelected()) {
                 if (id_area.getText().isEmpty() || in_building.getText().isEmpty()
                         || in_floor.getText().isEmpty() || in_description.getText().isEmpty()
-                        || in_room.getText().isEmpty()) error.setVisible(true);
-                else {
-                    error.setVisible(false);
+                        || in_room.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Certains champs sont incomplets !");
+                } else {
                     Sensor sensor = new InSensor(id_area.getText(), in_building.getText(),
                             in_floor.getText(), in_room.getText(), in_description.getText(),
                             InType.values()[type_box.getSelectedIndex()]);
@@ -166,9 +166,9 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
                 }
             } else {
                 if (id_area.getText().isEmpty() || out_longitude_area.getText().isEmpty()
-                        || out_latitude_area.getText().isEmpty() ) error.setVisible(true);
-                else {
-                    error.setVisible(false);
+                        || out_latitude_area.getText().isEmpty() ) {
+                    JOptionPane.showMessageDialog(this, "Certains champs sont incomplets !");
+                } else {
                     Sensor sensor = new OutSensor(id_area.getText(), out_latitude_area.getText(),
                             out_longitude_area.getText(), OutType.values()[type_box.getSelectedIndex()]);
                     new SimulationSensorFrame(sensor);

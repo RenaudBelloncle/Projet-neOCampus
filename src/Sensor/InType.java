@@ -1,11 +1,11 @@
 package Sensor;
 
 public enum InType {
-    TEMPERATURE,
-    HUMIDITE,
-    LUMINOSITE,
-    VOLUME_SONORE,
-    CONSOMMATION_ECLAIRAGE,
-    EAU_FROIDE,
-    EAU_CHAUDE
+    Température,
+    Humidité,
+    Luminosité,
+    Volume_Sonore,
+    Consommation_Eclairage,
+    Eau_Froide,
+    Eau_Chaude
 }
