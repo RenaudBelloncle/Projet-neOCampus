@@ -1,20 +1,23 @@
 package Sensor;
 
-public class InSensor extends Sensor{
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
 
+public class InSensor extends Sensor{
     private String building;
     private String floor;
     private String room;
     private String description;
-    private InType type;
 
-    public InSensor(String id, String building, String floor, String room, String description, InType type) {
-        super(id);
+    public InSensor(String id, SensorType sensorType, String building, String floor, String room, String description) {
+        super(id, sensorType);
         this.building = building;
         this.floor = floor;
         this.room = room;
         this.description = description;
-        this.type = type;
     }
 
     public String getBuilding() {
@@ -33,11 +36,19 @@ public class InSensor extends Sensor{
         return description;
     }
 
-    public InType getType() {
-        return type;
-    }
-
     public boolean isIn() {
         return true;
+    }
+
+    public boolean connection() throws IOException {
+        socket = new Socket("127.0.0.1", 7888);
+        br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        ps = new PrintStream(socket.getOutputStream());
+
+        ps.println("ConnexionCapteur;" + getId() + ";" + getSensorType().toString() + ";" + getBuilding() + ";"
+                + getFloor() + ";" + getRoom() + ";" + getDescription());
+        String line = br.readLine();
+
+        return line.equals("ConnexionOK");
     }
 }
