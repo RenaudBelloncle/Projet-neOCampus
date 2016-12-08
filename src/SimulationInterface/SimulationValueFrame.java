@@ -10,18 +10,13 @@ public class SimulationValueFrame extends JFrame{
 
     private Sensor sensor;
 
-    private JFrame window;
     /**
      * Creates new form SimulationValueFrame
      */
     public SimulationValueFrame(Sensor sensor) {
-        initComponents();
         this.sensor=sensor;
-        window=new JFrame();
-        window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        window.setSize(589, 300);
-        window.add(this);
-        window.setVisible(true);
+        initComponents();
+        this.setVisible(true);
     }
 
     /**
@@ -34,6 +29,8 @@ public class SimulationValueFrame extends JFrame{
     private void initComponents() {
         int[] intervale=new int[2];
         intervale=this.sensor.getSensorType().getInterval();
+
+        jPanel1 = new javax.swing.JPanel();
         dataType = new javax.swing.ButtonGroup();
         slipter1 = new javax.swing.JSeparator();
         id = new javax.swing.JLabel();
@@ -53,6 +50,8 @@ public class SimulationValueFrame extends JFrame{
         frequency = new javax.swing.JLabel();
         freqValue = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         id.setText(this.sensor.getId());
 
@@ -74,16 +73,7 @@ public class SimulationValueFrame extends JFrame{
 
         dataType.add(rnd);
         rnd.setText("Aléatoire");
-        rnd.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                rndMouseClicked(evt);
-            }
-        });
-        rnd.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentHidden(java.awt.event.ComponentEvent evt) {
-                rndComponentHidden(evt);
-            }
-        });
+
         rnd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rndActionPerformed(evt);
@@ -98,25 +88,21 @@ public class SimulationValueFrame extends JFrame{
             }
         });
 
-        connectFrame.setText("Envoie de donnèes");
+        connectFrame.setText("Envoie des données");
 
         dataValue.setText("Valeur de la données");
-        dataValue.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataValueActionPerformed(evt);
-            }
-        });
+
 
         frequency.setText("Frequence :");
 
         freqValue.setText("Valeur de la fréquence");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(slipter1, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(49, 49, 49)
                                 .addComponent(id)
                                 .addGap(104, 104, 104)
@@ -125,53 +111,52 @@ public class SimulationValueFrame extends JFrame{
                                 .addComponent(type)
                                 .addGap(75, 75, 75))
                         .addComponent(spliter2, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(99, 99, 99)
-                                                .addComponent(interBegin)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(interMin)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(comma)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(interMax)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(interEnd))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(246, 246, 246)
-                                                .addComponent(connectFrame)))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(89, 89, 89)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(frequency)
                                         .addComponent(data))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
                                                 .addComponent(fix)
                                                 .addGap(44, 44, 44)
                                                 .addComponent(rnd))
                                         .addComponent(dataValue)
                                         .addComponent(freqValue))
                                 .addGap(131, 131, 131))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 589, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(99, 99, 99)
+                                .addComponent(interBegin)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(interMin)
+                                .addGap(18, 18, 18)
+                                .addComponent(comma)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(interMax)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(interEnd)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(connectFrame)
+                                .addGap(219, 219, 219))
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
+        jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(24, 24, 24)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(loc)
                                         .addComponent(type)
                                         .addComponent(id))
                                 .addGap(18, 18, 18)
                                 .addComponent(slipter1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(interBegin)
                                         .addComponent(interMin)
                                         .addComponent(comma)
@@ -180,40 +165,53 @@ public class SimulationValueFrame extends JFrame{
                                 .addGap(18, 18, 18)
                                 .addComponent(spliter2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(rnd)
                                         .addComponent(fix)
                                         .addComponent(data))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(dataValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(frequency)
                                         .addComponent(freqValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(20, 20, 20)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(connectFrame)
-                                .addGap(124, 124, 124))
+                                .addGap(132, 132, 132))
         );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 613, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 334, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+
+        pack();
     }// </editor-fold>
 
-    private void dataValueActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void rndMouseClicked(java.awt.event.MouseEvent evt) {
-        dataValue.setVisible(false);
-    }
 
     private void rndActionPerformed(java.awt.event.ActionEvent evt) {
         dataValue.setEditable(false);
         dataValue.setVisible(false);
     }
 
-    private void rndComponentHidden(java.awt.event.ComponentEvent evt) {
-        // TODO add your handling code here:
-    }
 
     private void fixActionPerformed(java.awt.event.ActionEvent evt) {
         dataValue.setEditable(true);
@@ -235,6 +233,7 @@ public class SimulationValueFrame extends JFrame{
     private javax.swing.JLabel interEnd;
     private javax.swing.JLabel interMax;
     private javax.swing.JLabel interMin;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel loc;
     private javax.swing.JRadioButton rnd;
@@ -242,4 +241,5 @@ public class SimulationValueFrame extends JFrame{
     private javax.swing.JSeparator spliter2;
     private javax.swing.JLabel type;
     // End of variables declaration
+
 }
