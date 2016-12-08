@@ -51,11 +51,17 @@ public class SimulationValueFrame extends JFrame{
         freqValue = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         id.setText(this.sensor.getId());
 
-        loc.setText("location");
+        if(this.sensor.isIn()){
+            InSensor locIn=(InSensor) this.sensor;
+            loc.setText("Batiment:"+locIn.getBuilding()+"/Étage:"+locIn.getFloor()+"/Salle:"+locIn.getRoom()+"/Description:"+locIn.getDescription() );
+        }else{
+            OutSensor locOut=(OutSensor) this.sensor;
+            loc.setText("Long:"+locOut.getLatitude()+"/Lat:"+locOut.getLongitude());
+        }
 
         type.setText(this.sensor.getSensorType().toString());
 
@@ -103,13 +109,13 @@ public class SimulationValueFrame extends JFrame{
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(slipter1, javax.swing.GroupLayout.Alignment.TRAILING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(49, 49, 49)
+                                .addGap(20, 20, 20)
                                 .addComponent(id)
-                                .addGap(104, 104, 104)
+                                .addGap(35, 35, 35)
                                 .addComponent(loc)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(type)
-                                .addGap(75, 75, 75))
+                                .addGap(37, 37, 37))
                         .addComponent(spliter2, javax.swing.GroupLayout.Alignment.TRAILING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(89, 89, 89)
@@ -127,7 +133,7 @@ public class SimulationValueFrame extends JFrame{
                                 .addGap(131, 131, 131))
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 589, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(99, 99, 99)
                                 .addComponent(interBegin)
