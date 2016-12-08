@@ -208,8 +208,4 @@ public class SimulationMainFrame extends JFrame implements ActionListener {
         }
         type_box.setVisible(true);
     }
-
-    public static void main(String[] args) {
-        new SimulationMainFrame();
-    }
 }
