@@ -1,6 +1,9 @@
 package SimulationInterface;
 
-import Sensor.*;
+import Sensor.InSensor;
+import Sensor.OutSensor;
+import Sensor.Sensor;
+import Sensor.SensorType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,18 +50,18 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
     private JPanel button_panel;
     private JButton button;
 
-
     public SimulationSensorFrame() {
-        super("Création de capteur");
+        super("Création et connexion du capteur");
         setSize(400, 250);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        initialiser();
-        placer();
+        initialize();
+        place();
         setActionListener();
+        setResizable(false);
         setVisible(true);
     }
 
-    public void initialiser() {
+    private void initialize() {
         main_panel = new JPanel();
 
         id_panel = new JPanel();
@@ -78,7 +81,7 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
         building = new JLabel("Bâtiment : ");
         floor = new JLabel("Étage : ");
         room = new JLabel("Salle : ");
-        description = new JLabel("Complément : ");
+        description = new JLabel("Position relative : ");
         latitude = new JLabel("Latitude : ");
         longitude = new JLabel("Longitude : ");
         out_longitude_area = new JTextArea(1,15);
@@ -94,9 +97,10 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
 
         button_panel = new JPanel();
         button = new JButton("Créer et Connecter");
+        button.setEnabled(false);
     }
 
-    public void placer() {
+    private void place() {
         Container content = getContentPane();
         button_panel.add(button);
 
@@ -141,7 +145,7 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
         content.add(main_panel);
     }
 
-    public void setActionListener() {
+    private void setActionListener() {
         in.addActionListener(this);
         out.addActionListener(this);
         button.addActionListener(this);
@@ -151,15 +155,14 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == in) {
             setVisibleElement(true, false);
-
+            button.setEnabled(true);
         } else if (e.getSource() == out) {
             setVisibleElement(false, true);
-
+            button.setEnabled(true);
         } else if (e.getSource() == button) {
             if(in.isSelected()) {
                 if (id_area.getText().isEmpty() || in_building.getText().isEmpty()
-                        || in_floor.getText().isEmpty() || in_description.getText().isEmpty()
-                        || in_room.getText().isEmpty()) {
+                        || in_floor.getText().isEmpty() || in_room.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Certains champs sont incomplets !");
                 } else {
                     connection(new InSensor(id_area.getText(), (SensorType) type_box.getSelectedItem(),

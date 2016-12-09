@@ -24,10 +24,6 @@ public class OutSensor extends Sensor{
         return longitude;
     }
 
-    public boolean isOut() {
-        return true;
-    }
-
     public boolean connection() throws IOException {
         socket = new Socket("127.0.0.1", 7888);
         br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
