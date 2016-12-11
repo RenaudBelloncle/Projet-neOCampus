@@ -47,6 +47,15 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
     private JLabel type;
     private JComboBox<SensorType> type_box;
 
+    private JPanel panel_con;
+    private JLabel label_ip;
+    private JTextArea ip_1;
+    private JTextArea ip_2;
+    private JTextArea ip_3;
+    private JTextArea ip_4;
+    private JLabel label_port;
+    private JTextArea port;
+
     private JPanel button_panel;
     private JButton button;
 
@@ -95,6 +104,15 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
         type = new JLabel(" Capteur : ");
         type_box = new JComboBox<>();
 
+        panel_con = new JPanel();
+        label_ip = new JLabel(" Ip : ");
+        label_port = new JLabel(" Port : ");
+        ip_1 = new JTextArea(1,2);
+        ip_2 = new JTextArea(1,2);
+        ip_3 = new JTextArea(1,2);
+        ip_4 = new JTextArea(1,2);
+        port = new JTextArea(1, 10);
+
         button_panel = new JPanel();
         button = new JButton("Créer et Connecter");
         button.setEnabled(false);
@@ -103,6 +121,17 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
     private void place() {
         Container content = getContentPane();
         button_panel.add(button);
+
+        panel_con.add(label_ip);
+        panel_con.add(ip_1);
+        panel_con.add(new JLabel("."));
+        panel_con.add(ip_2);
+        panel_con.add(new JLabel("."));
+        panel_con.add(ip_3);
+        panel_con.add(new JLabel("."));
+        panel_con.add(ip_4);
+        panel_con.add(label_port);
+        panel_con.add(port);
 
         type_panel.add(type);
         type_panel.add(type_box);
@@ -141,6 +170,7 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
         main_panel.add(id_panel);
         main_panel.add(location_panel);
         main_panel.add(type_panel);
+        main_panel.add(panel_con);
         main_panel.add(button_panel);
         content.add(main_panel);
     }
