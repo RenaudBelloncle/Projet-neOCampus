@@ -17,7 +17,11 @@ public class InSensor extends Sensor{
         this.building = building;
         this.floor = floor;
         this.room = room;
-        this.description = description;
+        if (description.equals("")) {
+            this.description = " ";
+        } else {
+            this.description = description;
+        }
     }
 
     public String getBuilding() {

@@ -59,8 +59,10 @@ public class SimulationValueFrame implements ActionListener {
     private JLabel frequency_unit;
 
     private JPanel button_Panel;
-    private JButton button;
+    private JButton send_Button;
+    private JButton disc_Button;
     private boolean isSendingData = false;
+    private boolean isConnected = true;
 
     public SimulationValueFrame(Sensor sensor) {
         this.sensor = sensor;
@@ -139,8 +141,9 @@ public class SimulationValueFrame implements ActionListener {
         frequency_unit = new JLabel("s");
 
         button_Panel = new JPanel();
-        button = new JButton("Envoyer les données");
-        button.setEnabled(false);
+        send_Button = new JButton("Envoyer les données");
+        send_Button.setEnabled(false);
+        disc_Button = new JButton("Déconnexion");
     }
 
     private void place() {
@@ -176,7 +179,8 @@ public class SimulationValueFrame implements ActionListener {
         frequency_Panel.add(frequency_area);
         frequency_Panel.add(frequency_unit);
 
-        button_Panel.add(button);
+        button_Panel.add(send_Button);
+        button_Panel.add(disc_Button);
 
         main_Panel.add(sensor_id_Panel);
         main_Panel.add(sensor_type_Panel);
@@ -199,7 +203,8 @@ public class SimulationValueFrame implements ActionListener {
     private void setActionListener() {
         fixed.addActionListener(this);
         random.addActionListener(this);
-        button.addActionListener(this);
+        send_Button.addActionListener(this);
+        disc_Button.addActionListener(this);
     }
 
     private void setVisible() {
@@ -209,30 +214,38 @@ public class SimulationValueFrame implements ActionListener {
     }
 
     private void closeOperation() {
-        if (isSendingData) {
-            sensor.stopSendingData();
-            isSendingData = false;
-            button.setText("Envoyer les données");
+        if (isConnected) {
+            JOptionPane.showMessageDialog(frame, "Vous devez déconnecter le capteur du\n" +
+                    "réseau avant de fermer cette fenêtre !");
+        } else {
+            frame.setVisible(false);
+            frame.dispose();
         }
-        try {
-            if (sensor.disconnection()) {
-                JOptionPane.showMessageDialog(frame, "Déconnexion du capteur " + sensor.toString() + " réussie.");
-                frame.setVisible(false);
-                frame.dispose();
-            } else {
-                JOptionPane.showMessageDialog(frame, "Déconnexion du capteur " + sensor.toString() + " échouée.");
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Déconnexion du capteur " + sensor.toString() + " échouée.");
-        }
+    }
+
+    private void sendData() {
+        isSendingData = true;
+        send_Button.setText("Arrêt de l'envoi");
+        value_area.setEnabled(false);
+        frequency_area.setEnabled(false);
+        disc_Button.setEnabled(false);
+    }
+
+    private void stopSendingData() {
+        sensor.stopSendingData();
+        isSendingData = false;
+        send_Button.setText("Envoyer les données");
+        value_area.setEnabled(true);
+        frequency_area.setEnabled(true);
+        disc_Button.setEnabled(true);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == fixed || e.getSource() == random) {
             setVisible();
-            button.setEnabled(true);
-        } else if (e.getSource() == button) {
+            send_Button.setEnabled(true);
+        } else if (e.getSource() == send_Button) {
             if (!isSendingData) {
                 if (fixed.isSelected()) {
                     try {
@@ -241,8 +254,7 @@ public class SimulationValueFrame implements ActionListener {
                         if (val >= sensor.getSensorType().getInterval()[0]
                                 && val <= sensor.getSensorType().getInterval()[1]) {
                             sensor.sendData(val, freq);
-                            isSendingData = true;
-                            button.setText("Arrêt de l'envoi");
+                            sendData();
                         } else {
                             JOptionPane.showMessageDialog(frame, "Certains champs sont invalides !");
                         }
@@ -253,16 +265,42 @@ public class SimulationValueFrame implements ActionListener {
                     try {
                         long freq = Long.parseLong(frequency_area.getText());
                         sensor.sendRandomData(freq);
-                        isSendingData = true;
-                        button.setText("Arrêt de l'envoi");
+                        sendData();
                     } catch (NumberFormatException ignored) {
                         JOptionPane.showMessageDialog(frame, "Certains champs sont invalides !");
                     }
                 }
             } else {
-                sensor.stopSendingData();
-                isSendingData = false;
-                button.setText("Envoyer les données");
+                stopSendingData();
+            }
+        } else if (e.getSource() == disc_Button) {
+            if (isConnected) {
+                try {
+                    if (sensor.disconnection()) {
+                        JOptionPane.showMessageDialog(frame, "Déconnexion du capteur " + sensor.toString() + " réussie.");
+                        send_Button.setEnabled(false);
+                        disc_Button.setText("Connection");
+                        isConnected = false;
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Déconnexion du capteur " + sensor.toString() + " échouée.");
+                    }
+                } catch (IOException ignored) {
+                    JOptionPane.showMessageDialog(frame, "Déconnexion du capteur " + sensor.toString() + " échouée.");
+                }
+            } else {
+                try {
+                    if (sensor.connection()) {
+                        JOptionPane.showMessageDialog(frame, "Connexion du capteur " + sensor.toString() + " réussie.");
+                        send_Button.setEnabled(true);
+                        disc_Button.setText("Déconnexion");
+                        isConnected = true;
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Connexion du capteur " + sensor.toString() + " échouée.");
+                    }
+                } catch (IOException ignored) {
+                    JOptionPane.showMessageDialog(frame, "Connexion du capteur " + sensor.toString()
+                            + " échouée.\nAucune réponse du serveur !");
+                }
             }
         }
     }

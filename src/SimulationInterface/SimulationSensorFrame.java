@@ -240,7 +240,7 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
             } else {
                 JOptionPane.showMessageDialog(this, "Connexion du capteur " + sensor.toString() + " échouée.");
             }
-        } catch (IOException e1) {
+        } catch (IOException ignored) {
             JOptionPane.showMessageDialog(this, "Connexion du capteur " + sensor.toString()
                     + " échouée.\nAucune réponse du serveur !");
         }
