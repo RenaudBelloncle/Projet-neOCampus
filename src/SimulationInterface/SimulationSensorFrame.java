@@ -1,9 +1,6 @@
 package SimulationInterface;
 
-import Sensor.InSensor;
-import Sensor.OutSensor;
-import Sensor.Sensor;
-import Sensor.SensorType;
+import Sensor.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,14 +44,14 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
     private JLabel type;
     private JComboBox<SensorType> type_box;
 
-    private JPanel panel_con;
-    private JLabel label_ip;
-    private JTextArea ip_1;
-    private JTextArea ip_2;
-    private JTextArea ip_3;
-    private JTextArea ip_4;
-    private JLabel label_port;
-    private JTextArea port;
+    private JPanel connection_Panel;
+    private JLabel ip_Label;
+    private JTextArea ip1_area;
+    private JTextArea ip2_area;
+    private JTextArea ip3_area;
+    private JTextArea ip4_area;
+    private JLabel port_Label;
+    private JTextArea port_area;
 
     private JPanel button_panel;
     private JButton button;
@@ -104,14 +101,14 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
         type = new JLabel(" Capteur : ");
         type_box = new JComboBox<>();
 
-        panel_con = new JPanel();
-        label_ip = new JLabel(" Ip : ");
-        label_port = new JLabel(" Port : ");
-        ip_1 = new JTextArea(1,2);
-        ip_2 = new JTextArea(1,2);
-        ip_3 = new JTextArea(1,2);
-        ip_4 = new JTextArea(1,2);
-        port = new JTextArea(1, 10);
+        connection_Panel = new JPanel();
+        ip_Label = new JLabel(" Ip : ");
+        port_Label = new JLabel(" Port : ");
+        ip1_area = new JTextArea(1,3);
+        ip2_area = new JTextArea(1,3);
+        ip3_area = new JTextArea(1,3);
+        ip4_area = new JTextArea(1,3);
+        port_area = new JTextArea(1, 10);
 
         button_panel = new JPanel();
         button = new JButton("Créer et Connecter");
@@ -122,16 +119,16 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
         Container content = getContentPane();
         button_panel.add(button);
 
-        panel_con.add(label_ip);
-        panel_con.add(ip_1);
-        panel_con.add(new JLabel("."));
-        panel_con.add(ip_2);
-        panel_con.add(new JLabel("."));
-        panel_con.add(ip_3);
-        panel_con.add(new JLabel("."));
-        panel_con.add(ip_4);
-        panel_con.add(label_port);
-        panel_con.add(port);
+        connection_Panel.add(ip_Label);
+        connection_Panel.add(ip1_area);
+        connection_Panel.add(new JLabel("."));
+        connection_Panel.add(ip2_area);
+        connection_Panel.add(new JLabel("."));
+        connection_Panel.add(ip3_area);
+        connection_Panel.add(new JLabel("."));
+        connection_Panel.add(ip4_area);
+        connection_Panel.add(port_Label);
+        connection_Panel.add(port_area);
 
         type_panel.add(type);
         type_panel.add(type_box);
@@ -170,7 +167,7 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
         main_panel.add(id_panel);
         main_panel.add(location_panel);
         main_panel.add(type_panel);
-        main_panel.add(panel_con);
+        main_panel.add(connection_Panel);
         main_panel.add(button_panel);
         content.add(main_panel);
     }
@@ -190,25 +187,53 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
             setVisibleElement(false, true);
             button.setEnabled(true);
         } else if (e.getSource() == button) {
+            System.out.println(ip1_area.getText() + "." + ip2_area.getText() + "." + ip3_area.getText() + "." + ip4_area.getText());
             if(in.isSelected()) {
                 if (id_area.getText().isEmpty() || in_building.getText().isEmpty()
-                        || in_floor.getText().isEmpty() || in_room.getText().isEmpty()) {
+                        || in_floor.getText().isEmpty() || in_room.getText().isEmpty()
+                        || ip1_area.getText().isEmpty() || ip2_area.getText().isEmpty()
+                        || ip3_area.getText().isEmpty() || ip4_area.getText().isEmpty()
+                        || port_area.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Certains champs sont incomplets !");
                 } else {
-                    connection(new InSensor(id_area.getText(), (SensorType) type_box.getSelectedItem(),
-                            in_building.getText(), in_floor.getText(), in_room.getText(), in_description.getText()));
+                    try {
+                        int ip1 = Integer.parseInt(ip1_area.getText());
+                        int ip2 = Integer.parseInt(ip2_area.getText());
+                        int ip3 = Integer.parseInt(ip3_area.getText());
+                        int ip4 = Integer.parseInt(ip4_area.getText());
+                        int port = Integer.parseInt(port_area.getText());
+                        if (ip1 >= 0 && ip1 <= 255 && ip2 >= 0 && ip2 <= 255 && ip3 >= 0 && ip3 <= 255
+                                && ip4 >= 0 && ip4 <= 255 && port > 0) {
+                            String ip = ip1 + "." + ip2 + "." + ip3 + "." + ip4;
+                            connection(new InSensor(id_area.getText(), (SensorType) type_box.getSelectedItem(),
+                                    in_building.getText(), in_floor.getText(), in_room.getText(),
+                                    in_description.getText(), ip, port));
+                        }
+                    } catch (NumberFormatException ignored) {
+                        JOptionPane.showMessageDialog(this, "Certains champs sont invalides !");
+                    }
                 }
             } else {
                 if (id_area.getText().isEmpty() || out_longitude_area.getText().isEmpty()
-                        || out_latitude_area.getText().isEmpty() ) {
+                        || out_latitude_area.getText().isEmpty() || ip1_area.getText().isEmpty()
+                        || ip2_area.getText().isEmpty() || ip3_area.getText().isEmpty()
+                        || ip4_area.getText().isEmpty() || port_area.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Certains champs sont incomplets !");
                 } else {
                     try {
                         double latitude = Double.parseDouble(out_latitude_area.getText());
                         double longitude = Double.parseDouble(out_longitude_area.getText());
-                        if (latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180) {
+                        int ip1 = Integer.parseInt(ip1_area.getText());
+                        int ip2 = Integer.parseInt(ip2_area.getText());
+                        int ip3 = Integer.parseInt(ip3_area.getText());
+                        int ip4 = Integer.parseInt(ip4_area.getText());
+                        int port = Integer.parseInt(port_area.getText());
+                        if (latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180
+                                && ip1 >= 0 && ip1 <= 255 && ip2 >= 0 && ip2 <= 255 && ip3 >= 0 && ip3 <= 255
+                                && ip4 >= 0 && ip4 <= 255 && port > 0) {
+                            String ip = ip1 + "." + ip2 + "." + ip3 + "." + ip4;
                             connection(new OutSensor(id_area.getText(), (SensorType) type_box.getSelectedItem(),
-                                    out_latitude_area.getText(), out_longitude_area.getText()));
+                                    out_latitude_area.getText(), out_longitude_area.getText(), ip, port));
                         } else {
                             JOptionPane.showMessageDialog(this, "Certains champs sont invalides !");
                         }
