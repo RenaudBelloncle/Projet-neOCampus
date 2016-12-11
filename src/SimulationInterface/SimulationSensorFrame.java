@@ -1,12 +1,20 @@
 package SimulationInterface;
 
-import Sensor.*;
+import Sensor.InSensor;
+import Sensor.OutSensor;
+import Sensor.Sensor;
+import Sensor.SensorType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static Sensor.SensorType.*;
 
@@ -29,9 +37,9 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
     private JPanel location_description_panel;
     private JTextArea out_latitude_area;
     private JTextArea out_longitude_area;
-    private JTextArea in_building;
-    private JTextArea in_floor;
-    private JTextArea in_room;
+    private JComboBox<String> in_building;
+    private JComboBox<String> in_floor;
+    private JComboBox<String> in_room;
     private JTextArea in_description;
     private JLabel building;
     private JLabel floor;
@@ -56,15 +64,49 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
     private JPanel button_panel;
     private JButton button;
 
+    private List<String> building_List = new ArrayList<>();
+    private List<String> floor_List = new ArrayList<>();
+    private List<String> room_List = new ArrayList<>();
+
     public SimulationSensorFrame() {
         super("Création et connexion du capteur");
         setSize(400, 250);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        readConfigFile();
         initialize();
         place();
         setActionListener();
         setResizable(false);
         setVisible(true);
+    }
+
+    private void readConfigFile() {
+        String path = System.getProperty("user.dir");
+        String name = "config.txt";
+        File configFile = new File(path + "/" + name);
+        try {
+            if (configFile.createNewFile()) {
+                JOptionPane.showMessageDialog(this, "Le fichier de configuration n'a pas été trouvé.\n" +
+                        "Un fichier vierge a été créé.");
+            }
+            List<String> list = new ArrayList<>();
+            BufferedReader br = new BufferedReader(new FileReader(configFile));
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.equals("Étages")) {
+                    building_List.addAll(list);
+                    list.clear();
+                } else if (line.equals("Salles")) {
+                    floor_List.addAll(list);
+                    list.clear();
+                } else if (!line.equals("Bâtiments")) {
+                    list.add(line);
+                }
+            }
+            room_List.addAll(list);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initialize() {
@@ -92,9 +134,21 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
         longitude = new JLabel("Longitude : ");
         out_longitude_area = new JTextArea(1,15);
         out_latitude_area = new JTextArea(1,15);
-        in_building = new JTextArea(1,3);
-        in_floor = new JTextArea(1,3);
-        in_room = new JTextArea(1,3);
+        in_building = new JComboBox<>();
+        in_building.addItem("-");
+        for (String building : building_List) {
+            in_building.addItem(building);
+        }
+        in_floor = new JComboBox<>();
+        in_floor.addItem("-");
+        for (String floor : floor_List) {
+            in_floor.addItem(floor);
+        }
+        in_room = new JComboBox<>();
+        in_room.addItem("-");
+        for (String room : room_List) {
+            in_room.addItem(room);
+        }
         in_description = new JTextArea(1,20);
 
         type_panel = new JPanel();
@@ -187,10 +241,9 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
             setVisibleElement(false, true);
             button.setEnabled(true);
         } else if (e.getSource() == button) {
-            System.out.println(ip1_area.getText() + "." + ip2_area.getText() + "." + ip3_area.getText() + "." + ip4_area.getText());
             if(in.isSelected()) {
-                if (id_area.getText().isEmpty() || in_building.getText().isEmpty()
-                        || in_floor.getText().isEmpty() || in_room.getText().isEmpty()
+                if (id_area.getText().isEmpty() || in_building.getSelectedIndex() == 0
+                        || in_floor.getSelectedIndex() == 0 || in_room.getSelectedIndex() == 0
                         || ip1_area.getText().isEmpty() || ip2_area.getText().isEmpty()
                         || ip3_area.getText().isEmpty() || ip4_area.getText().isEmpty()
                         || port_area.getText().isEmpty()) {
@@ -206,7 +259,9 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
                                 && ip4 >= 0 && ip4 <= 255 && port > 0) {
                             String ip = ip1 + "." + ip2 + "." + ip3 + "." + ip4;
                             connection(new InSensor(id_area.getText(), (SensorType) type_box.getSelectedItem(),
-                                    in_building.getText(), in_floor.getText(), in_room.getText(),
+                                    building_List.get(in_building.getSelectedIndex()),
+                                    floor_List.get(in_floor.getSelectedIndex()),
+                                    room_List.get(in_floor.getSelectedIndex()),
                                     in_description.getText(), ip, port));
                         }
                     } catch (NumberFormatException ignored) {
