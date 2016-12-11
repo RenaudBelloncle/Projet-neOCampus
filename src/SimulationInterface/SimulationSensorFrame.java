@@ -173,8 +173,18 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
                         || out_latitude_area.getText().isEmpty() ) {
                     JOptionPane.showMessageDialog(this, "Certains champs sont incomplets !");
                 } else {
-                    connection(new OutSensor(id_area.getText(), (SensorType) type_box.getSelectedItem(),
-                            out_latitude_area.getText(),  out_longitude_area.getText()));
+                    try {
+                        double latitude = Double.parseDouble(out_latitude_area.getText());
+                        double longitude = Double.parseDouble(out_longitude_area.getText());
+                        if (latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180) {
+                            connection(new OutSensor(id_area.getText(), (SensorType) type_box.getSelectedItem(),
+                                    out_latitude_area.getText(), out_longitude_area.getText()));
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Certains champs sont invalides !");
+                        }
+                    } catch (NumberFormatException ignored) {
+                        JOptionPane.showMessageDialog(this, "Certains champs sont invalides !");
+                    }
                 }
             }
         }
