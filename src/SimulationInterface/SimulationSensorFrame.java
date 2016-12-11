@@ -259,9 +259,9 @@ public class SimulationSensorFrame extends JFrame implements ActionListener {
                                 && ip4 >= 0 && ip4 <= 255 && port > 0) {
                             String ip = ip1 + "." + ip2 + "." + ip3 + "." + ip4;
                             connection(new InSensor(id_area.getText(), (SensorType) type_box.getSelectedItem(),
-                                    building_List.get(in_building.getSelectedIndex()),
-                                    floor_List.get(in_floor.getSelectedIndex()),
-                                    room_List.get(in_floor.getSelectedIndex()),
+                                    building_List.get(in_building.getSelectedIndex()-1),
+                                    floor_List.get(in_floor.getSelectedIndex()-1),
+                                    room_List.get(in_floor.getSelectedIndex()-1),
                                     in_description.getText(), ip, port));
                         }
                     } catch (NumberFormatException ignored) {
