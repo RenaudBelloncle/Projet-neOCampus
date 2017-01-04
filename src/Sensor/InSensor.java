@@ -12,12 +12,17 @@ public class InSensor extends Sensor{
     private String room;
     private String description;
 
-    public InSensor(String id, SensorType sensorType, String building, String floor, String room, String description) {
-        super(id, sensorType);
+    public InSensor(String id, SensorType sensorType, String building, String floor,
+                    String room, String description, String ip, int port) {
+        super(id, sensorType, ip, port);
         this.building = building;
         this.floor = floor;
         this.room = room;
-        this.description = description;
+        if (description.equals("")) {
+            this.description = " ";
+        } else {
+            this.description = description;
+        }
     }
 
     public String getBuilding() {
@@ -41,7 +46,7 @@ public class InSensor extends Sensor{
     }
 
     public boolean connection() throws IOException {
-        socket = new Socket("127.0.0.1", 7888);
+        socket = new Socket(getIp(), getPort());
         br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         ps = new PrintStream(socket.getOutputStream());
 

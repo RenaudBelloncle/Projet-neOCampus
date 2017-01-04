@@ -10,8 +10,9 @@ public class OutSensor extends Sensor{
     private String latitude;
     private String longitude;
 
-    public OutSensor(String id, SensorType sensorType, String latitude, String longitude) {
-        super(id, sensorType);
+    public OutSensor(String id, SensorType sensorType, String latitude,
+                     String longitude, String ip, int port) {
+        super(id, sensorType, ip, port);
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -24,12 +25,8 @@ public class OutSensor extends Sensor{
         return longitude;
     }
 
-    public boolean isOut() {
-        return true;
-    }
-
     public boolean connection() throws IOException {
-        socket = new Socket("127.0.0.1", 7888);
+        socket = new Socket(getIp(), getPort());
         br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         ps = new PrintStream(socket.getOutputStream());
 
