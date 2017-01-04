@@ -8,6 +8,7 @@
       <w>aucune</w>
       <w>bpanel</w>
       <w>bâtiment</w>
+      <w>bâtiments</w>
       <w>capteur</w>
       <w>certains</w>
       <w>chaude</w>
@@ -17,6 +18,7 @@
       <w>connecter</w>
       <w>consommation</w>
       <w>créer</w>
+      <w>créé</w>
       <w>deconnexion</w>
       <w>defaultstate</w>
       <w>degrés</w>
@@ -28,6 +30,7 @@
       <w>eclairage</w>
       <w>eclaire</w>
       <w>envoie</w>
+      <w>existant</w>
       <w>extérieur</w>
       <w>fenêtre</w>
       <w>fermer</w>
@@ -59,6 +62,7 @@
       <w>réponse</w>
       <w>réussie</w>
       <w>salle</w>
+      <w>salles</w>
       <w>slipter</w>
       <w>sonore</w>
       <w>soundvolume</w>
@@ -66,11 +70,13 @@
       <w>sélection</w>
       <w>température</w>
       <w>valeurs</w>
+      <w>vierge</w>
       <w>vitesse</w>
       <w>windspeed</w>
       <w>échouée</w>
       <w>éclairage</w>
       <w>étage</w>
+      <w>étages</w>
     </words>
   </dictionary>
 </component>

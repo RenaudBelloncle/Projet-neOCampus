@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 public abstract class Sensor implements Runnable {
     private String id;
     private SensorType sensorType;
+    private String ip;
+    private int port;
 
     protected Socket socket = null;
     protected BufferedReader br = null;
@@ -25,9 +27,11 @@ public abstract class Sensor implements Runnable {
 
     private static Random random = new Random();
 
-    public Sensor(String id, SensorType sensorType) {
+    public Sensor(String id, SensorType sensorType, String ip, int port) {
         this.id = id;
         this.sensorType = sensorType;
+        this.ip = ip;
+        this.port = port;
         frequency = sensorType.getFrequency();
         decimalFormat = new DecimalFormat();
         decimalFormat.setMaximumFractionDigits(sensorType.getPrecision());
@@ -39,6 +43,14 @@ public abstract class Sensor implements Runnable {
 
     public SensorType getSensorType() {
         return sensorType;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     public boolean isIn() {
