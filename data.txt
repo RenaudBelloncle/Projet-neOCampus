@@ -1,0 +1,2 @@
+Radiateur;Température;Intérieur;U3;1;102;A l'entrée de la salle
+Radiateur;2017-01-05T09:23:03.00Z;20
