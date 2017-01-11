@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-public class OutSensor extends Sensor{
+public class OutSensor extends Sensor implements Comparable<OutSensor> {
     private String latitude;
     private String longitude;
 
@@ -39,5 +39,32 @@ public class OutSensor extends Sensor{
         String line = br.readLine();
 
         return line.equals("ConnexionOK");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        OutSensor outSensor = (OutSensor) o;
+
+        if (!getLatitude().equals(outSensor.getLatitude())) return false;
+        return getLongitude().equals(outSensor.getLongitude());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + getLatitude().hashCode();
+        result = 31 * result + getLongitude().hashCode();
+        return result;
+    }
+
+    @Override
+    public int compareTo(OutSensor sensor) {
+        if (getLatitude().equals(sensor.getLatitude()))
+            return getLongitude().compareTo(sensor.getLongitude());
+        return getLatitude().compareTo(sensor.getLatitude());
     }
 }

@@ -1,10 +1,15 @@
 package VisualisationInterface;
 
-import Sensor.*;
+import Sensor.Data;
+import Sensor.InSensor;
+import Sensor.OutSensor;
+import Sensor.SensorType;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,15 +38,16 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     private JMenuItem signIn;
     private JMenuItem signOut;
 
-    private JTree tree = new JTree();
+    private JTree tree;
+    private DefaultMutableTreeNode top = new DefaultMutableTreeNode("");
 
     private int nb_Sensor = 0;
     private JLabel status;
     private JLabel nb_Sensor_label;
 
-    private List<InSensor> inSensors = new ArrayList<>();
-    private List<OutSensor> outSensors = new ArrayList<>();
-    private Map<String, java.util.List<Data>> data = new HashMap<>();
+    private Set<InSensor> inSensors = new TreeSet<>();
+    private Set<OutSensor> outSensors = new TreeSet<>();
+    private Map<String, List<Data>> data = new HashMap<>();
 
     public VisualisationFrame(){
         super("Visualisation des capteurs");
@@ -55,6 +61,9 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     }
 
     private void initialize() {
+        readDataFile();
+        createJTree();
+
         menuBar = new JMenuBar();
         menu = new JMenu("Menu");
         menu_data = new JMenu("Données");
@@ -106,10 +115,15 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
-        String node = e.getNewLeadSelectionPath().getLastPathComponent().toString();
-        if (node == "") {
-        } else {
-            tabbed_panel.add(node, new JPanel());
+        TreeNode node = nextNode(top, e.getNewLeadSelectionPath().getLastPathComponent().toString());
+        if (node.isLeaf()) {
+            //TODO - Affichage courbe Bastien
+            tabbed_panel.add(node.toString(), new JPanel());
+            System.out.println("Courbe");
+        } else if (!((DefaultMutableTreeNode)node).isRoot()) {
+            //TODO - Affichage tableau Nahor
+            tabbed_panel.add(node.toString(), new JPanel());
+            System.out.println("Tableau");
         }
     }
 
@@ -179,6 +193,43 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     }
 
     private void createJTree() {
+        if (!inSensors.isEmpty()) {
+            DefaultMutableTreeNode in = new DefaultMutableTreeNode("Intérieur");
+            top.add(in);
 
+            for (InSensor inSensor: inSensors) {
+                TreeNode building = nextNode(in, inSensor.getBuilding());
+                in.add((DefaultMutableTreeNode)building);
+
+                TreeNode floor = nextNode(building, inSensor.getFloor());
+                ((DefaultMutableTreeNode)building).add((DefaultMutableTreeNode)floor);
+
+                TreeNode room = nextNode(floor, inSensor.getRoom());
+                ((DefaultMutableTreeNode)floor).add((DefaultMutableTreeNode)room);
+
+                DefaultMutableTreeNode sensor = new DefaultMutableTreeNode(inSensor.toString());
+                ((DefaultMutableTreeNode)room).add(sensor);
+            }
+        }
+
+        if (!outSensors.isEmpty()) {
+            DefaultMutableTreeNode out = new DefaultMutableTreeNode("Extérieur");
+            top.add(out);
+
+            for (OutSensor outSensor: outSensors) {
+                DefaultMutableTreeNode sensor = new DefaultMutableTreeNode(outSensor.toString());
+                out.add(sensor);
+            }
+        }
+
+        tree = new JTree(top);
+    }
+
+    private TreeNode nextNode(TreeNode node, String child) {
+        for (int i = 0; i < node.getChildCount(); i++) {
+            if (node.getChildAt(i).toString().equals(child))
+                return node.getChildAt(i);
+        }
+        return new DefaultMutableTreeNode(child);
     }
 }
