@@ -19,7 +19,7 @@ public class SensorType {
     private String type;
     private String unit;
     private String short_unit;
-    private int[] interval;
+    private int[] interval = new int[2];
     private int precision;
     private double margin;
     private int frequency;
@@ -29,7 +29,6 @@ public class SensorType {
         this.type = type;
         this.unit = unit;
         this.short_unit = short_unit;
-        interval = new int[2];
         interval[0] = interval_min;
         interval[1] = interval_max;
         this.precision = precision;
@@ -67,5 +66,41 @@ public class SensorType {
 
     public String toString() {
         return getType();
+    }
+
+    public static SensorType STRINGTOTYPE(String s) {
+        SensorType type = null;
+        switch (s) {
+            case "Température":
+                type = SensorType.TEMPERATURE;
+                break;
+            case "Humidité":
+                type = SensorType.HUMIDITY;
+                break;
+            case "Luminosité":
+                type = SensorType.BRIGHTNESS;
+                break;
+            case "Volume Sonore":
+                type = SensorType.SOUNDVOLUME;
+                break;
+            case "Consommation Eclairage":
+                type = SensorType.LIGHTCONSUMPTION;
+                break;
+            case "Eau Froide":
+                type = SensorType.COLDWATER;
+                break;
+            case "Eau Chaude":
+                type = SensorType.HOTWATER;
+                break;
+            case "Vitesse Vent":
+                type = SensorType.WINDSPEED;
+                break;
+            case "Pression Atmosphérique":
+                type = SensorType.ATMOSPHERICPRESSURE;
+                break;
+            default:
+                break;
+        }
+        return type;
     }
 }

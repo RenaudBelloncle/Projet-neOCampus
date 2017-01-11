@@ -10,6 +10,10 @@ public class OutSensor extends Sensor{
     private String latitude;
     private String longitude;
 
+    public OutSensor(String id, SensorType sensorType, String latitude, String longitude) {
+        this(id, sensorType, latitude, longitude, "", 0);
+    }
+
     public OutSensor(String id, SensorType sensorType, String latitude,
                      String longitude, String ip, int port) {
         super(id, sensorType, ip, port);

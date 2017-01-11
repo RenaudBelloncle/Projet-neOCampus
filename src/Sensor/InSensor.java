@@ -13,6 +13,11 @@ public class InSensor extends Sensor{
     private String description;
 
     public InSensor(String id, SensorType sensorType, String building, String floor,
+                    String room, String description) {
+        this(id, sensorType, building, floor, room, description, "", 0);
+    }
+
+    public InSensor(String id, SensorType sensorType, String building, String floor,
                     String room, String description, String ip, int port) {
         super(id, sensorType, ip, port);
         this.building = building;
