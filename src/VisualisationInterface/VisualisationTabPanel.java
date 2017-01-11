@@ -12,8 +12,9 @@ import static java.lang.System.exit;
 
 public class VisualisationTabPanel extends JPanel{
 
-    private static JPanel main_panel;
+
     private JTable sensors_array;
+    private JScrollPane scrollPane;
     private boolean inside;
     private String[][] table;
     private String title[];
@@ -26,7 +27,7 @@ public class VisualisationTabPanel extends JPanel{
             System.out.print("Erreur : une des listes est vides ou elles ne sont pas de meme tailles");
             exit(1);
         }
-        main_panel=new JPanel(new BorderLayout());
+
         inside= sensors.get(0).isIn();
 
 
@@ -62,7 +63,7 @@ public class VisualisationTabPanel extends JPanel{
         sensors_array=new JTable(table,title);
         sensors_array.setDefaultEditor(Object.class,null);
 
-        //sensors_array.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        sensors_array.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sensors_array.getColumnModel().getColumn(0).setPreferredWidth(100);
         sensors_array.getColumnModel().getColumn(1).setPreferredWidth(200);
 
@@ -78,8 +79,8 @@ public class VisualisationTabPanel extends JPanel{
             sensors_array.getColumnModel().getColumn(4).setPreferredWidth(100);
         }
 
-        main_panel.add(new JScrollPane(sensors_array),BorderLayout.CENTER);
-
+        scrollPane=new JScrollPane(sensors_array);
+        add(scrollPane);
 
     }
 
@@ -107,8 +108,8 @@ public class VisualisationTabPanel extends JPanel{
         val.add(12.);
         val.add(2.23);
         val.add(0.003);
-        new VisualisationTabPanel(liste,val);
-        fen.add(main_panel);
+        fen.setLayout(new BorderLayout());
+        fen.add(new VisualisationTabPanel(liste,val));
         fen.setVisible(true);
         fen.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
