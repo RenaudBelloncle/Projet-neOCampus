@@ -1,16 +1,24 @@
 package VisualisationInterface;
 
+import Sensor.*;
+
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.*;
+import java.util.List;
+
 
 public class VisualisationFrame extends JFrame implements TreeSelectionListener, ActionListener {
 
+    List<Sensor> liste=new ArrayList<Sensor>();
+    List<Double> val=new ArrayList<>();
     private JTabbedPane tabbed_panel;
     private JScrollPane scroll_panel;
+    private JScrollPane scroll_area;
     private JSplitPane main_split_panel;
     private JSplitPane split_panel;
 
@@ -52,10 +60,13 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         status = new JLabel("   Status : Déconnecté    ");
         nb_Sensor_label = new JLabel("Nb capteurs : "+nb_Sensor);
         tabbed_panel = new JTabbedPane(SwingConstants.TOP);
-        scroll_panel = new JScrollPane(tree, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        split_panel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scroll_panel, tabbed_panel);
-        dialog_area = new JTextArea(100, 20);
-        main_split_panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, dialog_area, split_panel);
+        scroll_panel = new JScrollPane(tree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        dialog_area = new JTextArea(25, 30);
+        dialog_area.setEditable(false);
+        dialog_area.setForeground(Color.BLACK);
+        scroll_area = new JScrollPane(dialog_area, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        split_panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, dialog_area, scroll_panel);
+        main_split_panel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, split_panel, tabbed_panel);
     }
 
     private void place() {
@@ -91,19 +102,42 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         refresh.addActionListener(this);
     }
 
+    public void sendErrorMessage(String text) {
+        dialog_area.setForeground(Color.RED);
+        dialog_area.append(text+"\n");
+    }
+
+    public void sendMessage(String text) {
+        dialog_area.setForeground(Color.BLACK);
+        dialog_area.append(text+"\n");
+    }
+
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         String node = e.getNewLeadSelectionPath().getLastPathComponent().toString();
         if (node == "") {
         } else {
-            tabbed_panel.add(node, new JPanel());
+            Sensor sen1=new InSensor("capteur1", SensorType.LIGHTCONSUMPTION,"U1","2","204","mid","127.0.0.1",513);
+            Sensor sen2=new InSensor("capteur2", SensorType.LIGHTCONSUMPTION,"U1","2","205","mid","127.0.0.1",513);
+            Sensor sen3=new InSensor("capteur3", SensorType.ATMOSPHERICPRESSURE,"U1","2","208","cote paralelees d fdvsdqfv","127.0.0.1",513);
+            liste.add(sen1);
+            liste.add(sen2);
+            liste.add(sen3);
+            val.add(12.);
+            val.add(2.23);
+            val.add(0.003);
+            JScrollPane scrollPane = new JScrollPane(new VisualisationTabPanel(liste, val));
+            tabbed_panel.add(node, scrollPane);
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == connection) {
-            if (connection.getText() == "Connexion au serveur") new ConnectionFrame();
+            if (connection.getText() == "Connexion au serveur") {
+                new ConnectionFrame();
+                sendMessage("Tentative de connexion au serveur");
+            }
             else {
 
             }
@@ -117,7 +151,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
             if (nb_Sensor > 0) {
                 nb_Sensor--;
                 nb_Sensor_label.setText("Nb capteurs : "+nb_Sensor);
-            } // sinon erreur
+            } else sendErrorMessage("Vous n'êtes inscrit à aucun capteur !");
         }
     }
 }

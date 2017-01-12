@@ -14,7 +14,6 @@ public class VisualisationTabPanel extends JPanel{
 
 
     private JTable sensors_array;
-    private JScrollPane scrollPane;
     private boolean inside;
     private String[][] table;
     private String title[];
@@ -45,6 +44,7 @@ public class VisualisationTabPanel extends JPanel{
                 table[i][6] = temp.getIp();
                 table[i][7] = ("" + temp.getPort());
                 table[i][8] = (""+values.get(i));
+
             }
         }else {
             title= new String[]{"Id", "Type de capteur", "Longitude","Latitude", "Ip", "Port","Valeur"};
@@ -79,38 +79,10 @@ public class VisualisationTabPanel extends JPanel{
             sensors_array.getColumnModel().getColumn(4).setPreferredWidth(100);
         }
 
-        scrollPane=new JScrollPane(sensors_array);
+        sensors_array.setPreferredScrollableViewportSize(sensors_array.getPreferredSize());
+        sensors_array.setFillsViewportHeight(true);
+        JScrollPane scrollPane = new JScrollPane(sensors_array);
         add(scrollPane);
 
-    }
-
-
-    public static void main(String[] args){
-        JFrame fen=new JFrame();
-        List<Sensor> liste=new ArrayList<Sensor>();
-        List<Double> val=new ArrayList<>();
-        fen.setSize(1200,900);
-        /*
-        Sensor sen=new OutSensor("toast", SensorType.ATMOSPHERICPRESSURE,"32.000","24.5000","127.46.33.2",5321);
-        Sensor blblbl=new OutSensor("tast", SensorType.ATMOSPHERICPRESSURE,"2.000","24.5000","127.46.33.1",51);
-        Sensor fp=new OutSensor("dbvcdbsfb", SensorType.ATMOSPHERICPRESSURE,"2.000","24.5000","127.46.33.1",51);
-        liste.add(sen);
-        liste.add(blblbl);
-        liste.add(fp);
-        */
-
-        Sensor sen1=new InSensor("capteur1",SensorType.LIGHTCONSUMPTION,"U1","2","204","mid","127.0.0.1",513);
-        Sensor sen2=new InSensor("capteur2",SensorType.LIGHTCONSUMPTION,"U1","2","205","mid","127.0.0.1",513);
-        Sensor sen3=new InSensor("capteur3",SensorType.ATMOSPHERICPRESSURE,"U1","2","208","cote paralelees d fdvsdqfv","127.0.0.1",513);
-        liste.add(sen1);
-        liste.add(sen2);
-        liste.add(sen3);
-        val.add(12.);
-        val.add(2.23);
-        val.add(0.003);
-        fen.setLayout(new BorderLayout());
-        fen.add(new VisualisationTabPanel(liste,val));
-        fen.setVisible(true);
-        fen.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 }
