@@ -23,10 +23,13 @@ public class ConnectionFrame extends JFrame implements ActionListener{
     private JPanel button_panel;
     private JPanel main_panel;
 
-    public ConnectionFrame(){
+    private VisualisationServer server;
+
+    public ConnectionFrame(VisualisationServer server){
         super("Connexion au serveur");
         setSize(450, 120);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        this.server = server;
         initialize();
         place();
         setListener();
@@ -79,9 +82,10 @@ public class ConnectionFrame extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == cancel) {
             this.dispose();
-        }
-        if (e.getSource() == connection) {
-
+        } else if (e.getSource() == connection) {
+            if (server.connect(id_text.getText(), ip_text.getText(), Integer.parseInt(port_text.getText()))) {
+                this.dispose();
+            }
         }
     }
 }

@@ -25,13 +25,16 @@ public class VisualisationServer implements Runnable {
     private Map<String, InSensor> inSensorMap = new HashMap<>();
     private Map<String, OutSensor> outSensorMap = new HashMap<>();
 
+    private boolean isConnected = false;
+
     public VisualisationServer(VisualisationFrame frame) {
         this.frame = frame;
     }
 
     public synchronized boolean connect(String id, String ip, int port) {
         startThread();
-        return openFileWriter() && connectServer(id, ip, port);
+        connectServer(id, ip, port);
+        return openFileWriter() && isConnected;
     }
 
     private synchronized void startThread() {
@@ -54,9 +57,8 @@ public class VisualisationServer implements Runnable {
         return true;
     }
 
-    private boolean connectServer(String id, String ip, int port) {
-        Socket socket = null;
-        boolean isConnected = false;
+    private void connectServer(String id, String ip, int port) {
+        Socket socket;
 
         try {
             socket = new Socket(ip, port);
@@ -65,11 +67,11 @@ public class VisualisationServer implements Runnable {
             ps.println("ConnexionVisu;" + id);
             String line = br.readLine();
             isConnected = line.equals("ConnexionOK");
+            if (isConnected)
+                frame.sendMessage("Connexion au serveur réussi");
         } catch (IOException e) {
             frame.sendErrorMessage("Echec de la connexion au serveur");
-            return false;
         }
-        return isConnected;
     }
 
     public synchronized boolean disconnect() {
@@ -107,20 +109,27 @@ public class VisualisationServer implements Runnable {
             switch (tokens[0]) {
                 case "CapteurPresent":
                     addSensor(tokens);
+                    frame.sendMessage("Capteur présent sur le serveur: " + tokens[1]);
                     break;
                 case "CapteurDeco":
                     removeSensor(tokens);
+                    frame.sendMessage(tokens[1] + " n'est plus sur le serveur");
                     break;
                 case "ValeurCapteur":
                     printLine(tokens[1] + ";"
                             + LocalDateTime.now().toString() + "Z;"
                             + tokens[2] + "\n");
+                    frame.sendMessage("Valeur reçu: " + tokens[1] + ", " + tokens[2]);
                     break;
                 case "InscriptionCapteurKO":
                     frame.sendErrorMessage("Echec de l'inscription à certains capteurs");
                     break;
                 case "DesinscriptionCapteurKO":
                     frame.sendErrorMessage("Echec de la désinscription à certains capteurs");
+                    break;
+                case "DeconnexionOK":
+                    frame.sendMessage("Déconnexion du serveur");
+                    isConnected = false;
                     break;
             }
         } catch (IOException e) {
@@ -188,5 +197,9 @@ public class VisualisationServer implements Runnable {
         for (String id: outSensorMap.keySet())
             outSensors.add(outSensorMap.get(id));
         return outSensors;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
     }
 }
