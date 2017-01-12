@@ -48,7 +48,7 @@ public class VisualisationServer implements Runnable {
         try {
             fw = new FileWriter(dataFile, true);
         } catch (IOException e) {
-            //TODO - Error message
+            frame.sendErrorMessage("Erreur lors de l'ouverture du fichier de données");
             return false;
         }
         return true;
@@ -66,7 +66,7 @@ public class VisualisationServer implements Runnable {
             String line = br.readLine();
             isConnected = line.equals("ConnexionOK");
         } catch (IOException e) {
-            //TODO - Error message
+            frame.sendErrorMessage("Echec de la connexion au serveur");
             return false;
         }
         return isConnected;
@@ -87,7 +87,7 @@ public class VisualisationServer implements Runnable {
         try {
             fw.close();
         } catch (IOException e) {
-            //TODO - Error message
+            frame.sendErrorMessage("Erreur lors de la fermeture du fichier de données");
             return false;
         }
         return true;
@@ -117,10 +117,10 @@ public class VisualisationServer implements Runnable {
                             + tokens[2] + "\n");
                     break;
                 case "InscriptionCapteurKO":
-                    //TODO - Error message
+                    frame.sendErrorMessage("Echec de l'inscription à certains capteurs");
                     break;
                 case "DesinscriptionCapteurKO":
-                    //TODO - Error message
+                    frame.sendErrorMessage("Echec de la désinscription à certains capteurs");
                     break;
             }
         } catch (IOException e) {
@@ -138,11 +138,13 @@ public class VisualisationServer implements Runnable {
 
     private void addSensor(String[] tokens) {
         SensorType type = SensorType.STRINGTOTYPE(tokens[2]);
-        if (tokens.length == 8)
+        if (tokens.length == 8) {
             inSensorMap.put(tokens[1], new InSensor(tokens[1], type, tokens[3],
                     tokens[4], tokens[5], tokens[6]));
-        else
+        }
+        else {
             outSensorMap.put(tokens[1], new OutSensor(tokens[1], type, tokens[3], tokens[4]));
+        }
     }
 
     private void removeSensor(String[] tokens) {
@@ -156,7 +158,7 @@ public class VisualisationServer implements Runnable {
         try {
             fw.write(line);
         } catch (IOException e) {
-            //TODO - Error message
+            frame.sendErrorMessage("Erreur lors de l'écriture dans le fichier de données");
         }
     }
 

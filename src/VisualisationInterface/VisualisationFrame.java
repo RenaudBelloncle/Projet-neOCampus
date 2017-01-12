@@ -22,8 +22,6 @@ import java.util.List;
 
 public class VisualisationFrame extends JFrame implements TreeSelectionListener, ActionListener {
 
-    List<Sensor> liste=new ArrayList<Sensor>();
-    List<Double> val=new ArrayList<>();
     private JTabbedPane tabbed_panel;
     private JScrollPane scroll_panel;
     private JScrollPane scroll_area;
@@ -52,6 +50,8 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     private Map<String, List<Data>> data = new HashMap<>();
     private Set<String> tabPanel = new TreeSet<>();
 
+    private VisualisationServer server = new VisualisationServer(this);
+
     public VisualisationFrame(){
         super("Visualisation des capteurs");
         setSize(850, 700);
@@ -64,9 +64,6 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     }
 
     private void initialize() {
-        readDataFile();
-        createJTree();
-
         menuBar = new JMenuBar();
         menu = new JMenu("Menu");
         menu_data = new JMenu("Données");
@@ -77,10 +74,14 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         status = new JLabel("   Status : Déconnecté    ");
         nb_Sensor_label = new JLabel("Nb capteurs : "+nb_Sensor);
         tabbed_panel = new JTabbedPane(SwingConstants.TOP);
-        scroll_panel = new JScrollPane(tree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         dialog_area = new JTextArea(25, 30);
         dialog_area.setEditable(false);
         dialog_area.setForeground(Color.BLACK);
+
+        readDataFile();
+        createJTree();
+
+        scroll_panel = new JScrollPane(tree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroll_area = new JScrollPane(dialog_area, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         split_panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, dialog_area, scroll_panel);
         main_split_panel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, split_panel, tabbed_panel);
@@ -126,7 +127,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
 
     public void sendMessage(String text) {
         dialog_area.setForeground(Color.BLACK);
-        dialog_area.append(text+"\n");
+        dialog_area.append(text + "\n");
     }
 
     @Override
@@ -149,17 +150,34 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
             }
         } else if (!node.toString().equals("")) {
             if (!tabPanel.contains(node.toString())) {
-                Sensor sen1=new Sensor.InSensor("capteur1", Sensor.SensorType.LIGHTCONSUMPTION,"U1","2","204","mid","127.0.0.1",513);
-                Sensor sen2=new Sensor.InSensor("capteur2", Sensor.SensorType.LIGHTCONSUMPTION,"U1","2","205","mid","127.0.0.1",513);
-                Sensor sen3=new Sensor.InSensor("capteur3", Sensor.SensorType.ATMOSPHERICPRESSURE,"U1","2","208","cote paralelees d fdvsdqfv","127.0.0.1",513);
-                liste.add(sen1);
-                liste.add(sen2);
-                liste.add(sen3);
-                val.add(12.);
-                val.add(2.23);
-                val.add(0.003);
-                JScrollPane scrollPane = new JScrollPane(new VisualisationTabPanel(liste, val));
-                tabbed_panel.add(node, scrollPane);
+                List<Sensor> sensors = new ArrayList<Sensor>();
+                List<Double> value = new ArrayList<>();
+
+                if (node.toString().equals("Extérieur")) {
+                    for (OutSensor sensor: outSensors) {
+                        sensors.add(sensor);
+                        value.add(data.get(sensor.getId()).get(data.get(sensor.getId()).size() - 1).getData());
+                    }
+                } else {
+                    if (node.toString().equals("Intérieur")) {
+                        for (InSensor sensor: inSensors) {
+                            sensors.add(sensor);
+                            value.add(data.get(sensor.getId()).get(data.get(sensor.getId()).size() - 1).getData());
+                        }
+                    } else {
+                        for (InSensor sensor: inSensors) {
+                            if (node.toString().equals(sensor.getBuilding())
+                                    || node.toString().equals(sensor.getFloor())
+                                    || node.toString().equals(sensor.getRoom())) {
+                                sensors.add(sensor);
+                                value.add(data.get(sensor.getId()).get(data.get(sensor.getId()).size() - 1).getData());
+                            }
+                        }
+                    }
+                }
+                JScrollPane scrollPane = new JScrollPane(
+                        new VisualisationTabPanel(this, sensors, value));
+                tabbed_panel.add(node.toString(), scrollPane);
                 tabPanel.add(node.toString());
                 System.out.println("Tableau");
             }
@@ -232,6 +250,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         } catch (IOException e) {
             e.printStackTrace();
         }
+        sendMessage("Fichier de données lu");
     }
 
     private void createJTree() {
