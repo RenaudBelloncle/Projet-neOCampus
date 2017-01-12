@@ -161,6 +161,7 @@ public class VisualisationServer implements Runnable {
             inSensorMap.remove(tokens[1]);
         else if (outSensorMap.containsKey(tokens[1]))
             outSensorMap.remove(tokens[1]);
+        frame.removeSensor(tokens[1]);
     }
 
     private void printLine(String line) {

@@ -52,6 +52,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     private Set<OutSensor> outSensors = new TreeSet<>();
     private Map<String, List<Data>> data = new HashMap<>();
     private Set<String> tabPanel = new TreeSet<>();
+    private List<String> signSensor = new ArrayList<>();
 
     private VisualisationServer server = new VisualisationServer(this);
 
@@ -216,8 +217,10 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         }
         if (e.getSource() == signIn) { // gestion erreur si déjà inscrit à tous les capteurs ?
             //TODO - Ouverture fenêtre choix
-            nb_Sensor++;
-            nb_Sensor_label.setText("Nb capteurs : "+nb_Sensor);
+            if (nb_Sensor < server.getListInSensor().size() + server.getListOutSensor().size()) {
+                nb_Sensor++;
+                nb_Sensor_label.setText("Nb capteurs : " + nb_Sensor);
+            }
         }
         if (e.getSource() == signOut) {
             //TODO - Ouverture fenêtre choix
@@ -314,5 +317,12 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
                 return nextNode(node.getChildAt(i), child);
         }
         return new DefaultMutableTreeNode(child);
+    }
+
+    public void removeSensor(String id) {
+        if (signSensor.contains(id)) {
+            nb_Sensor--;
+            signSensor.remove(id);
+        }
     }
 }
