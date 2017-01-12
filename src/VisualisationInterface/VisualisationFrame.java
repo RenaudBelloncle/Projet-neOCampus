@@ -2,20 +2,26 @@ package VisualisationInterface;
 
 import Sensor.*;
 
+import Sensor.Sensor;
+
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.List;
 
-
 public class VisualisationFrame extends JFrame implements TreeSelectionListener, ActionListener {
 
-    List<Sensor> liste=new ArrayList<Sensor>();
-    List<Double> val=new ArrayList<>();
     private JTabbedPane tabbed_panel;
     private JScrollPane scroll_panel;
     private JScrollPane scroll_area;
@@ -32,11 +38,19 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     private JMenuItem signIn;
     private JMenuItem signOut;
 
-    private JTree tree = new JTree();
+    private JTree tree;
+    private DefaultMutableTreeNode top = new DefaultMutableTreeNode("");
 
     private int nb_Sensor = 0;
     private JLabel status;
     private JLabel nb_Sensor_label;
+
+    private Set<InSensor> inSensors = new TreeSet<>();
+    private Set<OutSensor> outSensors = new TreeSet<>();
+    private Map<String, List<Data>> data = new HashMap<>();
+    private Set<String> tabPanel = new TreeSet<>();
+
+    private VisualisationServer server = new VisualisationServer(this);
 
     public VisualisationFrame(){
         super("Visualisation des capteurs");
@@ -60,10 +74,14 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         status = new JLabel("   Status : Déconnecté    ");
         nb_Sensor_label = new JLabel("Nb capteurs : "+nb_Sensor);
         tabbed_panel = new JTabbedPane(SwingConstants.TOP);
-        scroll_panel = new JScrollPane(tree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         dialog_area = new JTextArea(25, 30);
         dialog_area.setEditable(false);
         dialog_area.setForeground(Color.BLACK);
+
+        readDataFile();
+        createJTree();
+
+        scroll_panel = new JScrollPane(tree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroll_area = new JScrollPane(dialog_area, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         split_panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, dialog_area, scroll_panel);
         main_split_panel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, split_panel, tabbed_panel);
@@ -84,7 +102,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     }
 
     public void switchText() {
-        if (connection.getText() == "Connexion au serveur") {
+        if (connection.getText().equals("Connexion au serveur")) {
             connection.setText("Déconnexion du serveur");
             status.setText("   Status : Connecté      ");
         }
@@ -109,32 +127,67 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
 
     public void sendMessage(String text) {
         dialog_area.setForeground(Color.BLACK);
-        dialog_area.append(text+"\n");
+        dialog_area.append(text + "\n");
     }
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
-        String node = e.getNewLeadSelectionPath().getLastPathComponent().toString();
-        if (node == "") {
-        } else {
-            Sensor sen1=new InSensor("capteur1", SensorType.LIGHTCONSUMPTION,"U1","2","204","mid","127.0.0.1",513);
-            Sensor sen2=new InSensor("capteur2", SensorType.LIGHTCONSUMPTION,"U1","2","205","mid","127.0.0.1",513);
-            Sensor sen3=new InSensor("capteur3", SensorType.ATMOSPHERICPRESSURE,"U1","2","208","cote paralelees d fdvsdqfv","127.0.0.1",513);
-            liste.add(sen1);
-            liste.add(sen2);
-            liste.add(sen3);
-            val.add(12.);
-            val.add(2.23);
-            val.add(0.003);
-            JScrollPane scrollPane = new JScrollPane(new VisualisationTabPanel(liste, val));
-            tabbed_panel.add(node, scrollPane);
+        TreeNode node = nextNode(top, e.getNewLeadSelectionPath().getLastPathComponent().toString());
+        if (node.isLeaf()) {
+            if (!tabPanel.contains(node.toString())) {
+                Sensor sensor = null;
+                for (InSensor inSensor : inSensors)
+                    if (inSensor.getId().equals(node.toString()))
+                        sensor = inSensor;
+                for (OutSensor outSensor : outSensors)
+                    if (outSensor.getId().equals(node.toString()))
+                        sensor = outSensor;
+                if (sensor != null) {
+                    tabbed_panel.add(node.toString(),
+                            new VisualisationGraphPanel(sensor, data.get(sensor.getId())));
+                    tabPanel.add(node.toString());
+                }
+            }
+        } else if (!node.toString().equals("")) {
+            if (!tabPanel.contains(node.toString())) {
+                List<Sensor> sensors = new ArrayList<Sensor>();
+                List<Double> value = new ArrayList<>();
+
+                if (node.toString().equals("Extérieur")) {
+                    for (OutSensor sensor: outSensors) {
+                        sensors.add(sensor);
+                        value.add(data.get(sensor.getId()).get(data.get(sensor.getId()).size() - 1).getData());
+                    }
+                } else {
+                    if (node.toString().equals("Intérieur")) {
+                        for (InSensor sensor: inSensors) {
+                            sensors.add(sensor);
+                            value.add(data.get(sensor.getId()).get(data.get(sensor.getId()).size() - 1).getData());
+                        }
+                    } else {
+                        for (InSensor sensor: inSensors) {
+                            if (node.toString().equals(sensor.getBuilding())
+                                    || node.toString().equals(sensor.getFloor())
+                                    || node.toString().equals(sensor.getRoom())) {
+                                sensors.add(sensor);
+                                value.add(data.get(sensor.getId()).get(data.get(sensor.getId()).size() - 1).getData());
+                            }
+                        }
+                    }
+                }
+                JScrollPane scrollPane = new JScrollPane(
+                        new VisualisationTabPanel(this, sensors, value));
+                tabbed_panel.add(node.toString(), scrollPane);
+                tabPanel.add(node.toString());
+                System.out.println("Tableau");
+            }
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == connection) {
-            if (connection.getText() == "Connexion au serveur") {
+            if (connection.getText().equals("Connexion au serveur")) {
                 new ConnectionFrame();
                 sendMessage("Tentative de connexion au serveur");
             }
@@ -153,5 +206,93 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
                 nb_Sensor_label.setText("Nb capteurs : "+nb_Sensor);
             } else sendErrorMessage("Vous n'êtes inscrit à aucun capteur !");
         }
+    }
+
+    private void readDataFile() {
+        String path = System.getProperty("user.dir");
+        String name = "data.txt";
+
+        File dataFile = new File(path + "/" + name);
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(dataFile));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] tokens = line.split(";");
+                if (tokens.length == 3) {
+                    String id = tokens[0];
+                    Date date = Date.from(Instant.parse(tokens[1]));
+                    Double value = Double.valueOf(tokens[2]);
+
+                    java.util.List<Data> sensorValues = new ArrayList<>();
+                    if (data.containsKey(id))
+                        sensorValues = data.get(id);
+                    sensorValues.add(new Data(value, date));
+
+                    if (data.containsKey(id))
+                        data.replace(id, sensorValues);
+                    else
+                        data.put(id, sensorValues);
+                } else {
+                    SensorType type = SensorType.STRINGTOTYPE(tokens[1]);
+                    switch (tokens[2]) {
+                        case "Intérieur":
+                            inSensors.add(new InSensor(tokens[0], type, tokens[3],
+                                    tokens[4], tokens[5], tokens[6]));
+                            break;
+                        case "Extérieur":
+                            outSensors.add(new OutSensor(tokens[0], type, tokens[3], tokens[4]));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        sendMessage("Fichier de données lu");
+    }
+
+    private void createJTree() {
+        if (!inSensors.isEmpty()) {
+            DefaultMutableTreeNode in = new DefaultMutableTreeNode("Intérieur");
+            top.add(in);
+
+            for (InSensor inSensor: inSensors) {
+                DefaultMutableTreeNode building = nextNode(in, inSensor.getBuilding());
+                in.add(building);
+
+                DefaultMutableTreeNode floor = nextNode(building, inSensor.getFloor());
+                building.add(floor);
+
+                DefaultMutableTreeNode room = nextNode(floor, inSensor.getRoom());
+                floor.add(room);
+
+                DefaultMutableTreeNode sensor = new DefaultMutableTreeNode(inSensor.toString());
+                room.add(sensor);
+            }
+        }
+
+        if (!outSensors.isEmpty()) {
+            DefaultMutableTreeNode out = new DefaultMutableTreeNode("Extérieur");
+            top.add(out);
+
+            for (OutSensor outSensor: outSensors) {
+                DefaultMutableTreeNode sensor = new DefaultMutableTreeNode(outSensor.toString());
+                out.add(sensor);
+            }
+        }
+
+        tree = new JTree(top);
+    }
+
+    private DefaultMutableTreeNode nextNode(TreeNode node, String child) {
+        for (int i = 0; i < node.getChildCount(); i++) {
+            if (node.getChildAt(i).toString().equals(child))
+                return (DefaultMutableTreeNode)node.getChildAt(i);
+            else if (node.getChildAt(i).getChildCount() != 0)
+                return nextNode(node.getChildAt(i), child);
+        }
+        return new DefaultMutableTreeNode(child);
     }
 }

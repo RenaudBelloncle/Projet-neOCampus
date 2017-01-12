@@ -1,4 +1,4 @@
-package Sensor;
+package VisualisationInterface;
 
 import java.util.Date;
 
