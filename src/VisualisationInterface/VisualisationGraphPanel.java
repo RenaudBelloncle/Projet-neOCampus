@@ -1,19 +1,20 @@
 package VisualisationInterface;
 
-import Sensor.Data;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import Sensor.*;
-import org.jfree.chart.*;
+import Sensor.Sensor;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.*;
+import org.jfree.data.time.Month;
+import org.jfree.data.time.Second;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.RectangleInsets;
+
+import java.awt.*;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -96,11 +97,11 @@ public class VisualisationGraphPanel extends ChartPanel {
     }
 
     private static JFreeChart createChart(XYDataset dataset, Sensor sensor){
-        JFreeChart chart = ChartFactory.createTimeSeriesChart("Capteur",
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(null,
                 "Date",
-                sensor.getSensorType().getType()+"("+sensor.getSensorType().getUnit()+")",
+                sensor.getSensorType().getType()+"("+sensor.getSensorType().getShort_unit()+")",
                 dataset,
-                true, true, false);
+                false, true, false);
 
         XYPlot plot = chart.getXYPlot();//a verifier
         plot.setBackgroundPaint(Color.lightGray);
@@ -114,7 +115,7 @@ public class VisualisationGraphPanel extends ChartPanel {
     }
 
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         JFrame fen = new JFrame();
         fen.setSize(300, 300);
         JFreeChart chart;
@@ -136,5 +137,5 @@ public class VisualisationGraphPanel extends ChartPanel {
         fen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         fen.setVisible(true);
 
-    }
+    }*/
 }

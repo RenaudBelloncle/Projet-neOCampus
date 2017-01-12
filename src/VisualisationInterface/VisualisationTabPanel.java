@@ -1,11 +1,11 @@
 package VisualisationInterface;
 
 
-import Sensor.*;
+import Sensor.InSensor;
+import Sensor.OutSensor;
+import Sensor.Sensor;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.System.exit;
@@ -85,19 +85,19 @@ public class VisualisationTabPanel extends JPanel{
     }
 
 
-    public static void main(String[] args){
+    /*public static void main(String[] args){
         JFrame fen=new JFrame();
         List<Sensor> liste=new ArrayList<Sensor>();
         List<Double> val=new ArrayList<>();
         fen.setSize(1200,900);
-        /*
-        Sensor sen=new OutSensor("toast", SensorType.ATMOSPHERICPRESSURE,"32.000","24.5000","127.46.33.2",5321);
-        Sensor blblbl=new OutSensor("tast", SensorType.ATMOSPHERICPRESSURE,"2.000","24.5000","127.46.33.1",51);
-        Sensor fp=new OutSensor("dbvcdbsfb", SensorType.ATMOSPHERICPRESSURE,"2.000","24.5000","127.46.33.1",51);
-        liste.add(sen);
-        liste.add(blblbl);
-        liste.add(fp);
-        */
+
+        //Sensor sen=new OutSensor("toast", SensorType.ATMOSPHERICPRESSURE,"32.000","24.5000","127.46.33.2",5321);
+        //Sensor blblbl=new OutSensor("tast", SensorType.ATMOSPHERICPRESSURE,"2.000","24.5000","127.46.33.1",51);
+        //Sensor fp=new OutSensor("dbvcdbsfb", SensorType.ATMOSPHERICPRESSURE,"2.000","24.5000","127.46.33.1",51);
+        //liste.add(sen);
+        //liste.add(blblbl);
+        //liste.add(fp);
+
 
         Sensor sen1=new InSensor("capteur1",SensorType.LIGHTCONSUMPTION,"U1","2","204","mid","127.0.0.1",513);
         Sensor sen2=new InSensor("capteur2",SensorType.LIGHTCONSUMPTION,"U1","2","205","mid","127.0.0.1",513);
@@ -112,5 +112,5 @@ public class VisualisationTabPanel extends JPanel{
         fen.add(new VisualisationTabPanel(liste,val));
         fen.setVisible(true);
         fen.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-    }
+    }*/
 }

@@ -49,8 +49,7 @@ public class OutSensor extends Sensor implements Comparable<OutSensor> {
 
         OutSensor outSensor = (OutSensor) o;
 
-        if (!getLatitude().equals(outSensor.getLatitude())) return false;
-        return getLongitude().equals(outSensor.getLongitude());
+        return getLatitude().equals(outSensor.getLatitude()) && getLongitude().equals(outSensor.getLongitude());
     }
 
     @Override

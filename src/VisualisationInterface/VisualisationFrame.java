@@ -1,9 +1,6 @@
 package VisualisationInterface;
 
-import Sensor.Data;
-import Sensor.InSensor;
-import Sensor.OutSensor;
-import Sensor.SensorType;
+import Sensor.*;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -48,6 +45,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     private Set<InSensor> inSensors = new TreeSet<>();
     private Set<OutSensor> outSensors = new TreeSet<>();
     private Map<String, List<Data>> data = new HashMap<>();
+    private Set<String> tabPanel = new TreeSet<>();
 
     public VisualisationFrame(){
         super("Visualisation des capteurs");
@@ -95,7 +93,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     }
 
     public void switchText() {
-        if (connection.getText() == "Connexion au serveur") {
+        if (connection.getText().equals("Connexion au serveur")) {
             connection.setText("Déconnexion du serveur");
             status.setText("   Status : Connecté      ");
         }
@@ -117,20 +115,34 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     public void valueChanged(TreeSelectionEvent e) {
         TreeNode node = nextNode(top, e.getNewLeadSelectionPath().getLastPathComponent().toString());
         if (node.isLeaf()) {
-            //TODO - Affichage courbe Bastien
-            tabbed_panel.add(node.toString(), new JPanel());
-            System.out.println("Courbe");
-        } else if (!((DefaultMutableTreeNode)node).isRoot()) {
-            //TODO - Affichage tableau Nahor
-            tabbed_panel.add(node.toString(), new JPanel());
-            System.out.println("Tableau");
+            if (!tabPanel.contains(node.toString())) {
+                Sensor sensor = null;
+                for (InSensor inSensor : inSensors)
+                    if (inSensor.getId().equals(node.toString()))
+                        sensor = inSensor;
+                for (OutSensor outSensor : outSensors)
+                    if (outSensor.getId().equals(node.toString()))
+                        sensor = outSensor;
+                if (sensor != null) {
+                    tabbed_panel.add(node.toString(),
+                            new VisualisationGraphPanel(sensor, data.get(sensor.getId())));
+                    tabPanel.add(node.toString());
+                }
+            }
+        } else if (!node.toString().equals("")) {
+            if (!tabPanel.contains(node.toString())) {
+                //TODO - Affichage tableau Nahor
+                tabbed_panel.add(node.toString(), new JPanel());
+                tabPanel.add(node.toString());
+                System.out.println("Tableau");
+            }
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == connection) {
-            if (connection.getText() == "Connexion au serveur") new ConnectionFrame();
+            if (connection.getText().equals("Connexion au serveur")) new ConnectionFrame();
             else {
 
             }
@@ -198,17 +210,17 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
             top.add(in);
 
             for (InSensor inSensor: inSensors) {
-                TreeNode building = nextNode(in, inSensor.getBuilding());
-                in.add((DefaultMutableTreeNode)building);
+                DefaultMutableTreeNode building = nextNode(in, inSensor.getBuilding());
+                in.add(building);
 
-                TreeNode floor = nextNode(building, inSensor.getFloor());
-                ((DefaultMutableTreeNode)building).add((DefaultMutableTreeNode)floor);
+                DefaultMutableTreeNode floor = nextNode(building, inSensor.getFloor());
+                building.add(floor);
 
-                TreeNode room = nextNode(floor, inSensor.getRoom());
-                ((DefaultMutableTreeNode)floor).add((DefaultMutableTreeNode)room);
+                DefaultMutableTreeNode room = nextNode(floor, inSensor.getRoom());
+                floor.add(room);
 
                 DefaultMutableTreeNode sensor = new DefaultMutableTreeNode(inSensor.toString());
-                ((DefaultMutableTreeNode)room).add(sensor);
+                room.add(sensor);
             }
         }
 
@@ -225,10 +237,12 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         tree = new JTree(top);
     }
 
-    private TreeNode nextNode(TreeNode node, String child) {
+    private DefaultMutableTreeNode nextNode(TreeNode node, String child) {
         for (int i = 0; i < node.getChildCount(); i++) {
             if (node.getChildAt(i).toString().equals(child))
-                return node.getChildAt(i);
+                return (DefaultMutableTreeNode)node.getChildAt(i);
+            else if (node.getChildAt(i).getChildCount() != 0)
+                return nextNode(node.getChildAt(i), child);
         }
         return new DefaultMutableTreeNode(child);
     }
