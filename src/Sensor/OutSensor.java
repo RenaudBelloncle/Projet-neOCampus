@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-public class OutSensor extends Sensor implements Comparable<OutSensor> {
+public class OutSensor extends Sensor {
     private String latitude;
     private String longitude;
 
@@ -60,7 +60,6 @@ public class OutSensor extends Sensor implements Comparable<OutSensor> {
         return result;
     }
 
-    @Override
     public int compareTo(OutSensor sensor) {
         if (getLatitude().equals(sensor.getLatitude()))
             return getLongitude().compareTo(sensor.getLongitude());

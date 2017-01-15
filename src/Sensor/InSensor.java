@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-public class InSensor extends Sensor implements Comparable<InSensor> {
+public class InSensor extends Sensor {
     private String building;
     private String floor;
     private String room;
@@ -62,7 +62,6 @@ public class InSensor extends Sensor implements Comparable<InSensor> {
         return line.equals("ConnexionOK");
     }
 
-    @Override
     public int compareTo(InSensor sensor) {
         return getId().compareTo(sensor.getId());
     }

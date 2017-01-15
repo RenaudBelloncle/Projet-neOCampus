@@ -8,14 +8,16 @@ import Sensor.Sensor;
 import javax.swing.*;
 import java.util.List;
 
-public class VisualisationTabPanel extends JPanel {
+public class VisualisationTabPanel extends JPanel implements Comparable<VisualisationTabPanel> {
 
-    public VisualisationTabPanel(VisualisationFrame frame, List<Sensor> sensors, List<Double> values){
+    private List<Sensor> sensors;
+    private List<Double> values;
+    private JTable sensors_array;
 
-        if(sensors.isEmpty() || values.isEmpty() || sensors.size() != values.size()) {
-            frame.sendErrorMessage("Erreur dans la liste des capteurs.");
-            return;
-        }
+    public VisualisationTabPanel(List<Sensor> sensors, List<Double> values){
+
+        this.sensors = sensors;
+        this.values = values;
 
         boolean inside = sensors.get(0).isIn();
 
@@ -50,7 +52,7 @@ public class VisualisationTabPanel extends JPanel {
             }
         }
 
-        JTable sensors_array = new JTable(table, title);
+        sensors_array = new JTable(table, title);
         sensors_array.setDefaultEditor(Object.class,null);
         sensors_array.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sensors_array.getColumnModel().getColumn(0).setPreferredWidth(100);
@@ -63,5 +65,22 @@ public class VisualisationTabPanel extends JPanel {
         sensors_array.setFillsViewportHeight(true);
         JScrollPane scrollPane = new JScrollPane(sensors_array);
         add(scrollPane);
+    }
+
+    public void update(String id, double data) {
+        for (int i = 0; i < sensors.size(); i++) {
+            if (sensors.get(i).getId().equals(id)) {
+                values.set(i, data);
+                if (sensors.get(i).isIn())
+                    sensors_array.setValueAt(data, i, 6);
+                else
+                    sensors_array.setValueAt(data, i, 4);
+            }
+        }
+    }
+
+    @Override
+    public int compareTo(VisualisationTabPanel o) {
+        return sensors.get(0).compareTo(o.sensors.get(0));
     }
 }
