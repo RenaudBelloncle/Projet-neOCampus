@@ -328,8 +328,10 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
             sensorData.put(id, dataList);
         }
 
+        boolean alert = false;
+
         for (VisualisationTabPanel tabPanel: openTabPanel)
-            tabPanel.update(id, data);
+            tabPanel.update(id, data, alert);
     }
 
     public void updateStatus(String newStatus) {

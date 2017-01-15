@@ -77,13 +77,17 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
         add(scrollPane);
     }
 
-    public void update(String id, double data) {
+    public void update(String id, double data, boolean alert) {
         for (int i = 0; i < sensors.size(); i++) {
             if (sensors.get(i).getId().equals(id)) {
                 values.set(i, data);
                 TableModel model = sensors_array.getModel();
                 model.setValueAt(String.valueOf(data), i, model.getColumnCount() - 1);
                 sensors_array.setModel(model);
+                if (alert) {
+                    sensors_array.changeSelection(i, 0, false, false);
+                    sensors_array.changeSelection(i, sensors_array.getColumnCount() - 1, false, true);
+                }
             }
         }
     }
