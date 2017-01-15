@@ -54,12 +54,12 @@ public class ListFrame extends JFrame implements ActionListener{
         boxTab = new JCheckBox[inList.size()+outList.size()];
 
         for (int i = 0; i < inList.size(); i++) {
-            boxTab[i] = new JCheckBox(inList.get(i).getId());
+            boxTab[i] = new JCheckBox(inList.get(i).getId()+", intérieur, ");
             if (signList.contains(inList.get(i))) boxTab[i].setSelected(true);
             listPanel.add(new JPanel().add(boxTab[i]));
         }
         for (int i = inList.size(); i < outList.size()+inList.size(); i++) {
-            boxTab[i] = new JCheckBox(outList.get(i-inList.size()).getId());
+            boxTab[i] = new JCheckBox(outList.get(i-inList.size()).getId()+", extérieur");
             if (signList.contains(outList.get(i-inList.size()))) boxTab[i].setSelected(true);
             listPanel.add(new JPanel().add(boxTab[i]));
         }
@@ -100,11 +100,10 @@ public class ListFrame extends JFrame implements ActionListener{
             for (int i = 0; i < signList.size(); i++) {
                 if(!newSignList.contains(signList.get(i)))signOutSensor.add(signList.get(i).getId());
             }
-            signList = newSignList;
+            frame.setSignList(newSignList);
             server.signInSensors(signInSensor);
             server.signOutSensors(signOutSensor);
-            frame.setNb_Sensor(signList.size());
-            frame.updateNbSensor(signList.size());
+            frame.updateNbSensor(newSignList.size());
             dispose();
         }
     }

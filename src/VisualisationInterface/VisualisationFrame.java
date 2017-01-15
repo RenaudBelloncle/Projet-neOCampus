@@ -2,8 +2,6 @@ package VisualisationInterface;
 
 import Sensor.*;
 
-import Sensor.Sensor;
-
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -37,6 +35,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     private JMenuItem close;
     private JMenuItem closeAll;
     private JMenuItem alert;
+    private JMenuItem closeAlert;
     private JMenuItem connection;
     private JMenuItem signIn;
 
@@ -44,8 +43,10 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
     private DefaultMutableTreeNode top = new DefaultMutableTreeNode("");
 
     private int nb_Sensor = 0;
+    private int nbAlert = 0;
     private JLabel status;
     private JLabel nb_Sensor_label;
+    private JLabel nb_Alert_label;
 
     private Set<InSensor> inSensors = new TreeSet<>();
     private Set<OutSensor> outSensors = new TreeSet<>();
@@ -55,10 +56,12 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
 
     private VisualisationServer server = new VisualisationServer(this);
     private List<Sensor> signList = new ArrayList<>();
+    private List<Alert> alertList = new ArrayList<>();
 
     private List<String> building_List = new ArrayList<>();
     private List<String> floor_List = new ArrayList<>();
     private List<String> room_List = new ArrayList<>();
+
 
     public VisualisationFrame(){
         super("Visualisation des capteurs");
@@ -86,8 +89,10 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         close = new JMenuItem("Fermer onglet actif");
         closeAll = new JMenuItem("Fermer tous les onglets");
         alert = new JMenuItem("Créer une alerte");
+        closeAlert = new JMenuItem("Supprimer une alerte");
         status = new JLabel("   Status : Déconnecté    ");
         nb_Sensor_label = new JLabel("Nb capteurs : "+nb_Sensor);
+        nb_Alert_label = new JLabel("   Nb alertes : "+nbAlert);
         tabbed_panel = new JTabbedPane(SwingConstants.TOP);
         dialog_area = new JTextArea(10,25);
 
@@ -112,10 +117,12 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         data.add(close);
         data.add(closeAll);
         data.add(alert);
+        data.add(closeAlert);
         menuBar.add(menu);
         menuBar.add(data);
         menuBar.add(status);
         menuBar.add(nb_Sensor_label);
+        menuBar.add(nb_Alert_label);
         setJMenuBar(menuBar);
         content.add(main_split_panel);
     }
@@ -127,7 +134,9 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         close.addActionListener(this);
         closeAll.addActionListener(this);
         alert.addActionListener(this);
+        closeAlert.addActionListener(this);
     }
+
 
     public void sendErrorMessage(String text) {
         dialog_area.setForeground(Color.RED);
@@ -138,6 +147,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         dialog_area.setForeground(Color.BLACK);
         dialog_area.append(text + "\n");
     }
+
 
     private void closeOperation() {
         if (server.isConnected()) {
@@ -296,6 +306,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         }
     }
 
+
     public void addSensor(Sensor sensor) {
         if (sensor.isIn()) {
             inSensors.add((InSensor) sensor);
@@ -319,6 +330,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         }
     }
 
+
     public void updateData(String id, double data) {
         if (sensorData.containsKey(id)) {
             sensorData.get(id).add(new Data(data, Date.from(Instant.now())));
@@ -329,6 +341,20 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         }
 
         boolean alert = false;
+        if (alertList.size() != 0) {
+            Sensor sensor = null;
+            for (Sensor s: signList)
+                if (s.getId().equals(id))
+                    sensor = s;
+
+            if (sensor != null) {
+                for (Alert a: alertList)
+                    if (a.getSensorType().equals(sensor.getSensorType()))
+                        if (data < a.getMin() || data > a.getMax())
+                            alert = true;
+
+            }
+        }
 
         for (VisualisationTabPanel tabPanel: openTabPanel)
             tabPanel.update(id, data, alert);
@@ -342,9 +368,31 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         nb_Sensor_label.setText("Nb capteurs : "+ nb);
     }
 
-    public void setNb_Sensor(int nb_Sensor) {
-        this.nb_Sensor = nb_Sensor;
+    public void updateNbAlert(int nb) {
+        nb_Alert_label.setText("   Nb alertes : "+ nb);
     }
+
+
+    public void setSignList(List<Sensor> signList) {
+        this.signList = signList;
+    }
+
+    public void setAlertList(List<Alert> alertList) {
+        this.alertList = alertList;
+    }
+
+    public void addToAlert(Alert alert) {
+        this.alertList.add(alert);
+    }
+
+    public int getNbAlert() {
+        return nbAlert;
+    }
+
+    public void setNbAlert(int nbAlert) {
+        this.nbAlert = nbAlert;
+    }
+
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
@@ -461,7 +509,13 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         }
 
         if (e.getSource() == alert) {
+            new AlertFrame(this, signList);
+        }
 
+        if (e.getSource() == closeAlert) {
+            if (alertList.size() != 0) {
+                new DeleteAlertFrame(this, alertList);
+            } else sendMessage("Il n'y a aucune alerte à supprimer ! ");
         }
     }
 
