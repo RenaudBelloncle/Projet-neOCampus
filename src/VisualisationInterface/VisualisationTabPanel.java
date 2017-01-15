@@ -6,6 +6,7 @@ import Sensor.OutSensor;
 import Sensor.Sensor;
 
 import javax.swing.*;
+import javax.swing.table.TableModel;
 import java.util.List;
 
 public class VisualisationTabPanel extends JPanel implements Comparable<VisualisationTabPanel> {
@@ -13,6 +14,8 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
     private String name;
     private List<Sensor> sensors;
     private List<Double> values;
+    private String[][] table;
+    private Object[][] data;
     private JTable sensors_array;
 
     public VisualisationTabPanel(String name, List<Sensor> sensors, List<Double> values){
@@ -23,7 +26,6 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
 
         boolean inside = sensors.get(0).isIn();
 
-        String[][] table;
         String[] title;
         Sensor temp;
 
@@ -38,19 +40,25 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
                 table[i][3] = ((InSensor) temp).getFloor();
                 table[i][4] = ((InSensor) temp).getRoom();
                 table[i][5] = ((InSensor) temp).getDescription();
-                table[i][6] = (""+values.get(i));
+                if (values.get(i) == 5000.0)
+                    table[i][6] = "";
+                else
+                    table[i][6] = (""+values.get(i));
 
             }
         } else {
             title = new String[]{"Id", "Type de capteur", "Longitude","Latitude","Valeur"};
-            table =new String[sensors.size()][5];
+            table = new String[sensors.size()][5];
             for(int i=0;i<sensors.size();i++) {
                 temp = sensors.get(i);
                 table[i][0] = temp.getId();
                 table[i][1] = temp.getSensorType().getType();
                 table[i][2] = ((OutSensor) temp).getLongitude();
                 table[i][3] = ((OutSensor) temp).getLatitude();
-                table[i][4] = (""+values.get(i));
+                if (values.get(i) == 5000.0)
+                    table[i][4] = "";
+                else
+                    table[i][4] = (""+values.get(i));
             }
         }
 
@@ -73,10 +81,13 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
         for (int i = 0; i < sensors.size(); i++) {
             if (sensors.get(i).getId().equals(id)) {
                 values.set(i, data);
+                TableModel model = sensors_array.getModel();
+
                 if (sensors.get(i).isIn())
-                    sensors_array.setValueAt(data, i, 6);
+                    model.setValueAt(String.valueOf(data), i, 6);
                 else
-                    sensors_array.setValueAt(data, i, 4);
+                    model.setValueAt(String.valueOf(data), i, 4);
+                sensors_array.setModel(model);
             }
         }
     }

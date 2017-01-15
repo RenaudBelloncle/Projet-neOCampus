@@ -349,9 +349,8 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         String path = e.getPath().toString();
         String[] tokens = path.substring(1, path.length() - 1).split(", ");
         String last = e.getNewLeadSelectionPath().getLastPathComponent().toString();
-        System.out.println(last);
 
-        if (!openPanel.contains(last)) {
+        if (!openPanel.contains(last) && tokens.length > 1) {
             Sensor sensor = null;
             for (InSensor inSensor : inSensors)
                 if (last.equals(inSensor.getId()))
@@ -407,7 +406,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
                     if (sensorData.containsKey(s.getId()))
                         values.add(sensorData.get(s.getId()).get(sensorData.get(s.getId()).size() - 1).getData());
                     else
-                        values.add(0.0);
+                        values.add(5000.0);
                 }
 
                 if (!sensorList.isEmpty()) {
