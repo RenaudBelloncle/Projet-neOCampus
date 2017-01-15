@@ -8,7 +8,6 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -329,8 +328,10 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
             sensorData.put(id, dataList);
         }
 
+        boolean alert = false;
+
         for (VisualisationTabPanel tabPanel: openTabPanel)
-            tabPanel.update(id, data);
+            tabPanel.update(id, data, alert);
     }
 
     public void updateStatus(String newStatus) {
@@ -350,9 +351,8 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         String path = e.getPath().toString();
         String[] tokens = path.substring(1, path.length() - 1).split(", ");
         String last = e.getNewLeadSelectionPath().getLastPathComponent().toString();
-        System.out.println(last);
 
-        if (!openPanel.contains(last)) {
+        if (!openPanel.contains(last) && tokens.length > 1) {
             Sensor sensor = null;
             for (InSensor inSensor : inSensors)
                 if (last.equals(inSensor.getId()))
@@ -408,11 +408,11 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
                     if (sensorData.containsKey(s.getId()))
                         values.add(sensorData.get(s.getId()).get(sensorData.get(s.getId()).size() - 1).getData());
                     else
-                        values.add(0.0);
+                        values.add(5000.0);
                 }
 
                 if (!sensorList.isEmpty()) {
-                    VisualisationTabPanel tabPanel = new VisualisationTabPanel(sensorList, values);
+                    VisualisationTabPanel tabPanel = new VisualisationTabPanel(last, sensorList, values);
                     JScrollPane scrollPane = new JScrollPane(tabPanel);
                     tabbed_panel.add(last, scrollPane);
                     openPanel.add(last);
@@ -430,7 +430,10 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
                 new ConnectionFrame(this, server);
                 sendMessage("Tentative de connexion au serveur");
             } else {
-                if (server.disconnect()) updateStatus("   Status : Déconnecté    ");
+                if (server.disconnect()) {
+                    updateStatus("   Status : Déconnecté    ");
+                    updateNbSensor(0);
+                }
             }
         }
 
@@ -442,10 +445,18 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
 
         if (e.getSource() == close) {
             openPanel.remove(tabbed_panel.getTitleAt(tabbed_panel.getSelectedIndex()));
+            VisualisationTabPanel tabPanel = null;
+            for (VisualisationTabPanel panel: openTabPanel)
+                if (panel.getName().equals(tabbed_panel.getTitleAt(tabbed_panel.getSelectedIndex())))
+                    tabPanel = panel;
+            if (tabPanel != null)
+                openTabPanel.remove(tabPanel);
             tabbed_panel.remove(tabbed_panel.getSelectedComponent());
         }
 
         if (e.getSource() == closeAll) {
+            openPanel.clear();
+            openTabPanel.clear();
             tabbed_panel.removeAll();
         }
 
