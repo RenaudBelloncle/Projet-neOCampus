@@ -428,7 +428,10 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
                 new ConnectionFrame(this, server);
                 sendMessage("Tentative de connexion au serveur");
             } else {
-                if (server.disconnect()) updateStatus("   Status : Déconnecté    ");
+                if (server.disconnect()) {
+                    updateStatus("   Status : Déconnecté    ");
+                    updateNbSensor(0);
+                }
             }
         }
 

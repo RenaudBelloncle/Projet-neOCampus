@@ -82,11 +82,7 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
             if (sensors.get(i).getId().equals(id)) {
                 values.set(i, data);
                 TableModel model = sensors_array.getModel();
-
-                if (sensors.get(i).isIn())
-                    model.setValueAt(String.valueOf(data), i, 6);
-                else
-                    model.setValueAt(String.valueOf(data), i, 4);
+                model.setValueAt(String.valueOf(data), i, model.getColumnCount() - 1);
                 sensors_array.setModel(model);
             }
         }
