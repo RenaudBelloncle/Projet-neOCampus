@@ -35,7 +35,7 @@ public class AlertFrame extends JFrame implements ActionListener{
         this.frame = frame;
         this.signList = signList;
 
-        setSize(600, 120);
+        setSize(500, 120);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         initialize();
         place();
@@ -102,8 +102,9 @@ public class AlertFrame extends JFrame implements ActionListener{
         } else if (e.getSource() == ok) {
             try {
                 frame.addToAlert(new Alert("Alerte"+frame.getNbAlert(), SensorType.STRINGTOTYPE(sensor.getItemAt(sensor.getSelectedIndex())),
-                        Double.parseDouble(min.getText().replace(",", ".")), Double.parseDouble(min.getText().replace(",", "."))));
-                frame.setNbAlert(frame.getNbAlert()+1);
+                        Double.parseDouble(min.getText().replace(",", ".")), Double.parseDouble(max.getText().replace(",", "."))));
+                frame.updateNbAlert(frame.getNbAlert()+1);
+                frame.sendMessage("Création d'une alerte sur " + SensorType.STRINGTOTYPE(sensor.getItemAt(sensor.getSelectedIndex())));
                 this.dispose();
             } catch (NumberFormatException ignored) {
                 JOptionPane.showMessageDialog(this, "La valeur entrée n'est pas valide !");

@@ -51,7 +51,7 @@ public class VisualisationServer implements Runnable {
             if (isConnected)
                 frame.sendMessage("Connexion au serveur réussi");
         } catch (IOException e) {
-            frame.sendErrorMessage("Echec de la connexion au serveur");
+            frame.sendMessage("Echec de la connexion au serveur");
         }
     }
 
@@ -92,10 +92,10 @@ public class VisualisationServer implements Runnable {
                     frame.sendMessage("Valeur reçu: " + tokens[1] + ", " + tokens[2]);
                     break;
                 case "InscriptionCapteurKO":
-                    frame.sendErrorMessage("Echec de l'inscription à certains capteurs");
+                    frame.sendMessage("Echec de l'inscription à certains capteurs");
                     break;
                 case "DesinscriptionCapteurKO":
-                    frame.sendErrorMessage("Echec de la désinscription à certains capteurs");
+                    frame.sendMessage("Echec de la désinscription à certains capteurs");
                     break;
                 case "DeconnexionOK":
                     frame.sendMessage("Déconnexion du serveur");

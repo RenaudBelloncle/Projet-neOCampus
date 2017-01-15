@@ -137,12 +137,6 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         closeAlert.addActionListener(this);
     }
 
-
-    public void sendErrorMessage(String text) {
-        dialog_area.setForeground(Color.RED);
-        dialog_area.append(text+"\n");
-    }
-
     public void sendMessage(String text) {
         dialog_area.setForeground(Color.BLACK);
         dialog_area.append(text + "\n");
@@ -341,8 +335,8 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         }
 
         boolean alert = false;
+        Sensor sensor = null;
         if (alertList.size() != 0) {
-            Sensor sensor = null;
             for (Sensor s: signList)
                 if (s.getId().equals(id))
                     sensor = s;
@@ -350,14 +344,26 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
             if (sensor != null) {
                 for (Alert a: alertList)
                     if (a.getSensorType().equals(sensor.getSensorType()))
-                        if (data < a.getMin() || data > a.getMax())
+                        if (data < a.getMin() || data > a.getMax()) {
                             alert = true;
-
+                            sendMessage("ALERTE - " + id + " -> " + data);
+                        }
             }
         }
 
+        boolean isIn = false;
         for (VisualisationTabPanel tabPanel: openTabPanel)
-            tabPanel.update(id, data, alert);
+            if (tabPanel.update(id, data, alert)) {
+                tabbed_panel.setSelectedIndex(tabbed_panel.indexOfTab(tabPanel.getName()));
+                isIn = true;
+            }
+
+        if (!isIn && alert) {
+            if (sensor.isIn())
+                openTab("Intérieur", "[, Intérieur]", true);
+            else
+                openTab("Extérieur", "[, Extérieur]", true);
+        }
     }
 
     public void updateStatus(String newStatus) {
@@ -389,31 +395,23 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         return nbAlert;
     }
 
-    public void setNbAlert(int nbAlert) {
-        this.nbAlert = nbAlert;
-    }
-
-
-    @Override
-    public void valueChanged(TreeSelectionEvent e) {
-        String path = e.getPath().toString();
+    public void openTab(String id, String path, boolean alert) {
         String[] tokens = path.substring(1, path.length() - 1).split(", ");
-        String last = e.getNewLeadSelectionPath().getLastPathComponent().toString();
 
-        if (!openPanel.contains(last) && tokens.length > 1) {
+        if (!openPanel.contains(id) && tokens.length > 1) {
             Sensor sensor = null;
             for (InSensor inSensor : inSensors)
-                if (last.equals(inSensor.getId()))
+                if (id.equals(inSensor.getId()))
                     sensor = inSensor;
             for (OutSensor outSensor : outSensors)
-                if (last.equals(outSensor.getId()))
+                if (id.equals(outSensor.getId()))
                     sensor = outSensor;
 
             if (sensor != null) {
-                if (sensorData.containsKey(last)) {
-                    VisualisationGraphPanel graphPanel = new VisualisationGraphPanel(sensor, sensorData.get(last));
-                    tabbed_panel.add(last, graphPanel);
-                    openPanel.add(last);
+                if (sensorData.containsKey(id)) {
+                    VisualisationGraphPanel graphPanel = new VisualisationGraphPanel(sensor, sensorData.get(id));
+                    tabbed_panel.add(id, graphPanel);
+                    openPanel.add(id);
                 } else
                     sendMessage("Il n'y a aucun historique de valeur pour ce capteur.");
             } else {
@@ -460,15 +458,23 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
                 }
 
                 if (!sensorList.isEmpty()) {
-                    VisualisationTabPanel tabPanel = new VisualisationTabPanel(last, sensorList, values);
+                    VisualisationTabPanel tabPanel = new VisualisationTabPanel(id, sensorList, values, alert);
                     JScrollPane scrollPane = new JScrollPane(tabPanel);
-                    tabbed_panel.add(last, scrollPane);
-                    openPanel.add(last);
+                    tabbed_panel.add(id, scrollPane);
+                    openPanel.add(id);
                     openTabPanel.add(tabPanel);
                 } else
                     sendMessage("Il n'y a aucun capteur à afficher");
             }
         }
+    }
+
+    @Override
+    public void valueChanged(TreeSelectionEvent e) {
+        String path = e.getPath().toString();
+        String last = e.getNewLeadSelectionPath().getLastPathComponent().toString();
+
+        openTab(last, path, false);
     }
 
     @Override
@@ -488,7 +494,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         if (e.getSource() == signIn) {
             if (server.getListInSensor().size() != 0 || server.getListOutSensor().size() != 0) {
                 new ListFrame(this, server, signList);
-            } else sendErrorMessage("Il n'y a aucun capteur auquel s'inscrire ! ");
+            } else sendMessage("Il n'y a aucun capteur auquel s'inscrire ! ");
         }
 
         if (e.getSource() == close) {

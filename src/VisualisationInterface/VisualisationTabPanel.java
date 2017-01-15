@@ -7,7 +7,6 @@ import Sensor.Sensor;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
-import java.awt.*;
 import java.util.List;
 
 public class VisualisationTabPanel extends JPanel implements Comparable<VisualisationTabPanel> {
@@ -15,11 +14,9 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
     private String name;
     private List<Sensor> sensors;
     private List<Double> values;
-    private String[][] table;
-    private Object[][] data;
     private JTable sensors_array;
 
-    public VisualisationTabPanel(String name, List<Sensor> sensors, List<Double> values){
+    public VisualisationTabPanel(String name, List<Sensor> sensors, List<Double> values, boolean alert){
 
         this.name = name;
         this.sensors = sensors;
@@ -30,9 +27,10 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
         String[] title;
         Sensor temp;
 
+        String[][] table;
         if(inside) {
-            title = new String[]{"Id", "Type de capteur", "Batiment", "Étage", "Salle", "Description","Valeur"};
-            table =new String[sensors.size()][7];
+            title = new String[]{"Id", "Type de capteur", "Batiment", "Étage", "Salle", "Description","Valeur","Alerte"};
+            table =new String[sensors.size()][8];
             for(int i=0;i<sensors.size();i++) {
                 temp = sensors.get(i);
                 table[i][0] = temp.getId();
@@ -45,11 +43,15 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
                     table[i][6] = "";
                 else
                     table[i][6] = (""+values.get(i));
+                if (alert)
+                    table[i][7] = "ALERTE";
+                else
+                    table[i][7] = "";
 
             }
         } else {
-            title = new String[]{"Id", "Type de capteur", "Longitude","Latitude","Valeur"};
-            table = new String[sensors.size()][5];
+            title = new String[]{"Id", "Type de capteur", "Longitude","Latitude","Valeur","Alerte"};
+            table = new String[sensors.size()][6];
             for(int i=0;i<sensors.size();i++) {
                 temp = sensors.get(i);
                 table[i][0] = temp.getId();
@@ -60,6 +62,10 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
                     table[i][4] = "";
                 else
                     table[i][4] = (""+values.get(i));
+                if (alert)
+                    table[i][5] = "ALERTE";
+                else
+                    table[i][5] = "";
             }
         }
 
@@ -78,19 +84,23 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
         add(scrollPane);
     }
 
-    public void update(String id, double data, boolean alert) {
+    public boolean update(String id, double data, boolean alert) {
+        boolean ret = false;
         for (int i = 0; i < sensors.size(); i++) {
             if (sensors.get(i).getId().equals(id)) {
                 values.set(i, data);
                 TableModel model = sensors_array.getModel();
-                model.setValueAt(String.valueOf(data), i, model.getColumnCount() - 1);
-                sensors_array.setModel(model);
+                model.setValueAt(String.valueOf(data), i, model.getColumnCount() - 2);
                 if (alert) {
-                    sensors_array.changeSelection(i, 0, false, false);
-                    sensors_array.changeSelection(i, sensors_array.getColumnCount() - 1, false, true);
-                }
+                    ret = true;
+                    model.setValueAt("ALERTE", i, model.getColumnCount() - 1);
+                } else
+                    model.setValueAt("", i, model.getColumnCount() - 1);
+                sensors_array.setModel(model);
             }
         }
+
+        return ret;
     }
 
     public String getName() {

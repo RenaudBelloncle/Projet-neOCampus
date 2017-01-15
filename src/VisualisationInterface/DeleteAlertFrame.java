@@ -25,7 +25,7 @@ public class DeleteAlertFrame extends JFrame implements ActionListener{
     private JButton cancel;
 
     public DeleteAlertFrame( VisualisationFrame frame, List<Alert> alertList){
-        super("Connexion au serveur");
+        super("Suppression des alertes");
         this.frame = frame;
         this.alertList = alertList;
 
@@ -77,6 +77,7 @@ public class DeleteAlertFrame extends JFrame implements ActionListener{
                 if (boxTab[i].isSelected()) alertList.remove(i);
             frame.setAlertList(alertList);
             frame.updateNbAlert(alertList.size());
+            frame.sendMessage("Suppression d'alerte, il en reste " + alertList.size());
             dispose();
         }
     }
