@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-public abstract class Sensor implements Runnable {
+public abstract class Sensor implements Runnable, Comparable<Sensor> {
     private String id;
     private SensorType sensorType;
     private String ip;
@@ -122,5 +122,17 @@ public abstract class Sensor implements Runnable {
     @Override
     public int hashCode() {
         return getId().hashCode();
+    }
+
+    @Override
+    public int compareTo(Sensor s) {
+        if (isIn() && s.isIn())
+            return ((InSensor) this).compareTo((InSensor) s);
+        else if (!isIn() && !s.isIn())
+            return ((OutSensor) this).compareTo((OutSensor) s);
+        else if (isIn())
+            return 1;
+        else
+            return -1;
     }
 }

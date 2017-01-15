@@ -6,18 +6,13 @@ import Sensor.SensorType;
 
 import java.io.*;
 import java.net.Socket;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class VisualisationServer implements Runnable {
     private VisualisationFrame frame;
 
     private BufferedReader br;
     private PrintStream ps;
-    private FileWriter fw;
 
     private Thread thread;
     private boolean isRunning = false;
@@ -32,29 +27,15 @@ public class VisualisationServer implements Runnable {
     }
 
     public synchronized boolean connect(String id, String ip, int port) {
-        startThread();
         connectServer(id, ip, port);
-        return openFileWriter() && isConnected;
+        startThread();
+        return isConnected;
     }
 
     private synchronized void startThread() {
         isRunning = true;
         thread = new Thread(this, "ReceiveData");
         thread.start();
-    }
-
-    private boolean openFileWriter() {
-        String path = System.getProperty("user.dir");
-        String name = "data.txt";
-        File dataFile = new File(path + "/" + name);
-
-        try {
-            fw = new FileWriter(dataFile, true);
-        } catch (IOException e) {
-            frame.sendErrorMessage("Erreur lors de l'ouverture du fichier de données");
-            return false;
-        }
-        return true;
     }
 
     private void connectServer(String id, String ip, int port) {
@@ -75,24 +56,14 @@ public class VisualisationServer implements Runnable {
     }
 
     public synchronized boolean disconnect() {
-        disconnectServer();
-        boolean isClosed = closeFileWriter();
         stopThread();
-        return isClosed;
+        disconnectServer();
+        return !isConnected;
     }
 
     private void disconnectServer() {
         ps.println("DeconnexionVisu");
-    }
-
-    private boolean closeFileWriter() {
-        try {
-            fw.close();
-        } catch (IOException e) {
-            frame.sendErrorMessage("Erreur lors de la fermeture du fichier de données");
-            return false;
-        }
-        return true;
+        isConnected = false;
     }
 
     private synchronized void stopThread() {
@@ -102,6 +73,7 @@ public class VisualisationServer implements Runnable {
 
     private void receiveLine() {
         try {
+            if (br == null) return;
             String line = br.readLine();
             if (line == null) return;
 
@@ -116,9 +88,7 @@ public class VisualisationServer implements Runnable {
                     frame.sendMessage(tokens[1] + " n'est plus sur le serveur");
                     break;
                 case "ValeurCapteur":
-                    printLine(tokens[1] + ";"
-                            + LocalDateTime.now().toString() + "Z;"
-                            + tokens[2] + "\n");
+                    frame.updateData(tokens[1], Double.parseDouble(tokens[2].replace(",",".")));
                     frame.sendMessage("Valeur reçu: " + tokens[1] + ", " + tokens[2]);
                     break;
                 case "InscriptionCapteurKO":
@@ -147,12 +117,15 @@ public class VisualisationServer implements Runnable {
 
     private void addSensor(String[] tokens) {
         SensorType type = SensorType.STRINGTOTYPE(tokens[2]);
-        if (tokens.length == 8) {
-            inSensorMap.put(tokens[1], new InSensor(tokens[1], type, tokens[3],
-                    tokens[4], tokens[5], tokens[6]));
-        }
-        else {
-            outSensorMap.put(tokens[1], new OutSensor(tokens[1], type, tokens[3], tokens[4]));
+        if (tokens.length == 7) {
+            InSensor sensor = new InSensor(tokens[1], type, tokens[3],
+                    tokens[4], tokens[5], tokens[6]);
+            inSensorMap.put(tokens[1], sensor);
+            frame.addSensor(sensor);
+        } else {
+            OutSensor sensor = new OutSensor(tokens[1], type, tokens[3], tokens[4]);
+            outSensorMap.put(tokens[1], sensor);
+            frame.addSensor(sensor);
         }
     }
 
@@ -164,22 +137,14 @@ public class VisualisationServer implements Runnable {
         frame.removeSensor(tokens[1]);
     }
 
-    private void printLine(String line) {
-        try {
-            fw.write(line);
-        } catch (IOException e) {
-            frame.sendErrorMessage("Erreur lors de l'écriture dans le fichier de données");
-        }
-    }
-
-    public void signInSensors(String[] ids) {
+    public void signInSensors(List<String> ids) {
         String line = "InscriptionCapteur";
         for (String id: ids)
             line += ";" + id;
         ps.println(line);
     }
 
-    public void signOutSensors(String[] ids) {
+    public void signOutSensors(List<String> ids) {
         String line = "DesinscriptionCapteur";
         for (String id: ids)
             line += ";" + id;
