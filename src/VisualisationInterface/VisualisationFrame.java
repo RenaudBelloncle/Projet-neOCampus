@@ -446,6 +446,8 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
         }
 
         if (e.getSource() == closeAll) {
+            openPanel.clear();
+            openTabPanel.clear();
             tabbed_panel.removeAll();
         }
 
