@@ -50,7 +50,8 @@ public class ListFrame extends JFrame implements ActionListener{
 
     private void initialize() {
         Container content = getContentPane();
-        listPanel = new JPanel(new GridLayout(inList.size()+outList.size(),1));
+        listPanel = new JPanel();
+        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         boxTab = new JCheckBox[inList.size()+outList.size()];
 
         for (int i = 0; i < inList.size(); i++) {
@@ -65,7 +66,8 @@ public class ListFrame extends JFrame implements ActionListener{
         }
 
         scrollPane = new JScrollPane(listPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        mainPanel = new JPanel(new GridLayout(2,1));
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
 
         ok = new JButton("Ok");
         cancel = new JButton("Annuler");
@@ -73,8 +75,8 @@ public class ListFrame extends JFrame implements ActionListener{
         buttonPanel.add(cancel);
         buttonPanel.add(ok);
 
-        mainPanel.add(scrollPane);
-        mainPanel.add(buttonPanel);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         content.add(mainPanel);
     }

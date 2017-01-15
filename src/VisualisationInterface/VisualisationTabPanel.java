@@ -7,6 +7,7 @@ import Sensor.Sensor;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
+import java.awt.*;
 import java.util.List;
 
 public class VisualisationTabPanel extends JPanel implements Comparable<VisualisationTabPanel> {
