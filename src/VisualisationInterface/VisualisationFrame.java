@@ -8,7 +8,6 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -412,7 +411,7 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
                 }
 
                 if (!sensorList.isEmpty()) {
-                    VisualisationTabPanel tabPanel = new VisualisationTabPanel(sensorList, values);
+                    VisualisationTabPanel tabPanel = new VisualisationTabPanel(last, sensorList, values);
                     JScrollPane scrollPane = new JScrollPane(tabPanel);
                     tabbed_panel.add(last, scrollPane);
                     openPanel.add(last);
@@ -442,6 +441,12 @@ public class VisualisationFrame extends JFrame implements TreeSelectionListener,
 
         if (e.getSource() == close) {
             openPanel.remove(tabbed_panel.getTitleAt(tabbed_panel.getSelectedIndex()));
+            VisualisationTabPanel tabPanel = null;
+            for (VisualisationTabPanel panel: openTabPanel)
+                if (panel.getName().equals(tabbed_panel.getTitleAt(tabbed_panel.getSelectedIndex())))
+                    tabPanel = panel;
+            if (tabPanel != null)
+                openTabPanel.remove(tabPanel);
             tabbed_panel.remove(tabbed_panel.getSelectedComponent());
         }
 

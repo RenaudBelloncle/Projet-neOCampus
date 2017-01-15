@@ -10,12 +10,14 @@ import java.util.List;
 
 public class VisualisationTabPanel extends JPanel implements Comparable<VisualisationTabPanel> {
 
+    private String name;
     private List<Sensor> sensors;
     private List<Double> values;
     private JTable sensors_array;
 
-    public VisualisationTabPanel(List<Sensor> sensors, List<Double> values){
+    public VisualisationTabPanel(String name, List<Sensor> sensors, List<Double> values){
 
+        this.name = name;
         this.sensors = sensors;
         this.values = values;
 
@@ -77,6 +79,10 @@ public class VisualisationTabPanel extends JPanel implements Comparable<Visualis
                     sensors_array.setValueAt(data, i, 4);
             }
         }
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
