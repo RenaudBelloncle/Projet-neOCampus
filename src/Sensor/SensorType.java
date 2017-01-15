@@ -1,5 +1,7 @@
 package Sensor;
 
+import java.util.Arrays;
+
 public class SensorType {
 
     public static final SensorType TEMPERATURE = new SensorType("Température",
@@ -66,6 +68,37 @@ public class SensorType {
 
     public String toString() {
         return getType();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SensorType that = (SensorType) o;
+
+        if (getPrecision() != that.getPrecision()) return false;
+        if (Double.compare(that.getMargin(), getMargin()) != 0) return false;
+        if (getFrequency() != that.getFrequency()) return false;
+        if (!getType().equals(that.getType())) return false;
+        if (!getUnit().equals(that.getUnit())) return false;
+        if (!getShort_unit().equals(that.getShort_unit())) return false;
+        return Arrays.equals(getInterval(), that.getInterval());
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = getType().hashCode();
+        result = 31 * result + getUnit().hashCode();
+        result = 31 * result + getShort_unit().hashCode();
+        result = 31 * result + Arrays.hashCode(getInterval());
+        result = 31 * result + getPrecision();
+        temp = Double.doubleToLongBits(getMargin());
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + getFrequency();
+        return result;
     }
 
     public static SensorType STRINGTOTYPE(String s) {
